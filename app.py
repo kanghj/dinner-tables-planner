@@ -1,6 +1,6 @@
 
 import os
-from flask import Flask, request, redirect, url_for, jsonify
+from flask import Flask, request, redirect
 from werkzeug.utils import secure_filename
 import uuid
 import csv
@@ -15,10 +15,9 @@ UPLOAD_FOLDER = '/tmp/'
 
 ALLOWED_EXTENSIONS = set(['csv'])
 
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024 # 500 megabytes
-
-
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 @app.route('/')
 def hello_world():
@@ -33,12 +32,13 @@ def hello_world():
     </form>
     '''
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 def convert(path, num_tables):
-    result = ''
 
     facts = []
 
@@ -52,12 +52,12 @@ def convert(path, num_tables):
                 if value not in persons:
                     persons.append(value)
                 community[key].append(persons.index(value))
-                
 
         knows_all_communities = []
         for community_name, members in community.items():
             knows = itertools.product(members, members)
-            knows_without_self_relations = filter(lambda pair: pair[0]!=pair[1], knows)
+            knows_without_self_relations = filter(
+                lambda pair: pair[0] != pair[1], knows)
 
             knows_all_communities.extend(knows_without_self_relations)
 
@@ -67,10 +67,8 @@ def convert(path, num_tables):
     facts.append('#const table_size = 10.')
     for know in knows_all_communities:
         facts.append('knows' + str(know) + '.')
-    
+
     return facts
-
-
 
 
 @app.route('/solve', methods=['POST'])
@@ -98,7 +96,8 @@ def solve():
             for fact in facts:
                 lp_file.write(fact + '\n')
 
-        proc = subprocess.Popen(['exec/clingo', facts_file], stdout=subprocess.PIPE)
+        proc = subprocess.Popen(['exec/clingo', facts_file],
+                                stdout=subprocess.PIPE)
         resp_text = []
         for line in proc.stdout:
             resp_text.append(line)
@@ -114,4 +113,3 @@ def solve():
         status=200,
         mimetype='application/json'
     )
-
