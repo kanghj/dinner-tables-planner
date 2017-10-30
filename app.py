@@ -103,6 +103,8 @@ def solve():
         for line in proc.stdout:
             resp_text.append(line)
 
+        os.remove(facts_file)
+
     result_dict = {
         'status': [x.decode('utf-8') for x in resp_text]
     }
