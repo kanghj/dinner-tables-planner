@@ -18,7 +18,8 @@ def hello_world():
     <form method="post" enctype="multipart/form-data" action="solve">
       <p><input type="file" name="file">
           <input type="number" name="tables" placeholder="Number of tables">
-          <input type="number" name="size" placeholder="Number of seats in a table">
+          <input type="number" name="size"
+                    placeholder="Number of seats in a table">
          <input type="submit" value="Upload">
     </form>
     '''
@@ -27,8 +28,6 @@ def hello_world():
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 
 
 @app.route('/solve', methods=['POST'])
