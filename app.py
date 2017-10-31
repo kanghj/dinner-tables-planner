@@ -13,7 +13,13 @@ app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
 def hello_world():
     return '''
     <!doctype html>
-    <title>Table Seating Planner</title>
+    <html>
+    <head>
+        <title>Table Seating Planner</title>
+    <link rel="stylesheet"
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    </head>
+    <body>
     <h1>Upload csv file of relationships</h1>
     <form method="post" enctype="multipart/form-data" action="solve">
       <p><input type="file" name="file">
@@ -22,6 +28,8 @@ def hello_world():
                     placeholder="Number of seats in a table">
          <input type="submit" value="Upload">
     </form>
+    </body>
+    </html>
     '''
 
 
@@ -47,8 +55,19 @@ def solve():
 
     tables, persons = partition_to_tables(num_tables, table_size, file)
 
+    page_html = """
+    <!doctype html>
+    <html>
+    <head>
+        <title>Tables</title>
+        <link rel="stylesheet"
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    </head>
+    {}
+    </html>
+    """.format(convert_tables_html(num_tables, table_size, persons, tables))
     return app.response_class(
-        response=convert_tables_html(num_tables, table_size, persons, tables),
+        response=page_html,
         status=200,
         mimetype='text/html'
     )
