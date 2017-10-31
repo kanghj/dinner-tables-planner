@@ -7,7 +7,6 @@ import csv
 from collections import defaultdict
 import itertools
 import subprocess
-import json
 import re
 
 app = Flask(__name__)
@@ -106,7 +105,7 @@ def solve():
         return redirect(request.url)
 
     if not file or not allowed_file(file.filename):
-        return redirect(request.url)        
+        return redirect(request.url)
 
     job_id = str(uuid.uuid4())
 
