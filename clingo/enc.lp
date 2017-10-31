@@ -19,5 +19,4 @@ total_cut(C) :- C = #sum { N : cut(I, N) }.
 
 #minimize {C@0 : total_cut(C)}.
 
-
 #show in_table/2.
