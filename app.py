@@ -150,8 +150,8 @@ def solve_by_clingo(facts, job_id):
 def convert_tables_html(num_tables, persons, tables):
     html = "<table>"
     headers = [str(i) for i in range(1, num_tables + 1)]
-    headers_html = "<th>" + "".join(
-        ["<td> Table" + j + "</td>" for j in headers]) + "</th>"
+    headers_html = "<tr>" + "".join(
+        ["<th> Table" + j + "</th>" for j in headers]) + "</tr>"
     html += headers_html
     body_html = ""
     for i in range(0, TABLE_SIZE):
