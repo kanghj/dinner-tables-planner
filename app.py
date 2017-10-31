@@ -54,7 +54,7 @@ def convert(path, num_tables):
             for key, value in row.items():
                 if value not in persons:
                     persons.append(value)
-                community[key].append(persons.index(value))
+                community[key].append(persons.index(value) + 1)
 
         knows_all_communities = []
         for community_name, members in community.items():
