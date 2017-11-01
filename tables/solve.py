@@ -24,20 +24,16 @@ def convert(path, num_tables, table_size):
                     persons.append(value)
                 community[key].append(persons.index(value) + 1)
 
-        knows_all_communities = []
-        for community_name, members in community.items():
-            knows = itertools.product(members, members)
-            knows_without_self_relations = filter(
-                lambda pair: pair[0] != pair[1], knows)
-
-            knows_all_communities.extend(knows_without_self_relations)
-
     facts.append('total_persons({}).'.format(len(persons)))
     facts.append('total_tables({}).'.format(num_tables))
+    facts.append('cliques({}).'.format(len(community.keys())))
+    clique_list = [clique for clique in community.keys()]
 
     facts.append('#const table_size = {}.'.format(table_size))
-    for know in knows_all_communities:
-        facts.append('knows' + str(know) + '.')
+    for community_name, members in community.items():
+        for member in members:
+            facts.append('in_clique({}, {}).'.format(
+                member, clique_list.index(community_name) + 1))
 
     return facts, persons
 
@@ -74,7 +70,7 @@ def solve_by_clingo(facts, job_id):
     with open(facts_file, 'w+') as lp_file:
         for fact in facts:
             lp_file.write(fact + '\n')
-    proc = subprocess.Popen(['exec/clingo', facts_file, 'clingo/enc.lp'],
+    proc = subprocess.Popen(['exec/clingo', '-t 4', facts_file, 'clingo/enc.lp'],
                             stdout=subprocess.PIPE)
     resp_text = []
     for line in proc.stdout:
