@@ -1,9 +1,11 @@
 %% persons and tables
 person(1..N) :- total_persons(N).
 table(1..M) :- total_tables(M).
+clique(1..C) :- cliques(C).
 
-%% assume relationships between people are symmetric
-knows(A, B) :- knows(B, A).
+total_cliques(A, N) :- person(A), N = #count { in_clique(A, C) : clique(C) }.
+
+
 
 %% each person belongs to 1 table
 { in_table(I, J) : table(J) } = 1 :- person(I).
@@ -14,9 +16,11 @@ knows(A, B) :- knows(B, A).
 { in_table(I, J) : person(I) } <= table_size :- table(J).
 
 %% 'cuts' counts relationships of people who are not sitting together
-cut(I, N) :- person(I), N = { knows(I, P) : person(P), in_table(I, J), not in_table(P, J) }.
-total_cut(C) :- C = #sum { N : cut(I, N) }.
+cut(A, N) :- person(A), N = { in_clique(B, C) : person(B), clique(C), in_clique(A, C), table(T), in_table(A, T), not in_table(B, T) }.
+total_cut(C) :- C = #sum { N,A : cut(A, N) }.
+
+#minimize {(in_table(A,T), in_table(B,Q))@1 : table(T), table(Q), person(A), person(B), in_clique(A, C), in_clique(B, C), total_cliques(A, 1), total_cliques(B, 1) }.
 
 #minimize {C@0 : total_cut(C)}.
 
-#show in_table/2.
+
