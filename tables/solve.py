@@ -1,7 +1,6 @@
 import csv
 import uuid
 from collections import defaultdict
-import itertools
 import subprocess
 import os
 import re
@@ -70,7 +69,8 @@ def solve_by_clingo(facts, job_id):
     with open(facts_file, 'w+') as lp_file:
         for fact in facts:
             lp_file.write(fact + '\n')
-    proc = subprocess.Popen(['exec/clingo', '-t 4', facts_file, 'clingo/enc.lp'],
+    proc = subprocess.Popen(['exec/clingo', '-t 4',
+                             facts_file, 'clingo/enc.lp'],
                             stdout=subprocess.PIPE)
     resp_text = []
     for line in proc.stdout:
