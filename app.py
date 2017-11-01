@@ -22,11 +22,15 @@ def hello_world():
     <body>
     <h1>Upload csv file of relationships</h1>
     <form method="post" enctype="multipart/form-data" action="solve">
-      <p><input type="file" name="file">
-          <input type="number" name="tables" placeholder="Number of tables">
+        <fieldset>
+          <input type="file" name="file">
+          <label for="tables">Number of tables</label>
+          <input type="number" name="tables" placeholder="20">
+          <label for="tables">Seats per table</label>
           <input type="number" name="size"
-                    placeholder="Number of seats in a table">
+                    placeholder="10">
          <input type="submit" value="Upload">
+        </fieldset>
     </form>
     </body>
     </html>
@@ -100,5 +104,4 @@ def convert_tables_html(num_tables, table_size, persons, tables):
             body_html += '<td>' + person_name + '</td>'
 
         body_html += "</tr>"
-    html += body_html + "</table>"
-    return html
+    return html + body_html + "</table>"
