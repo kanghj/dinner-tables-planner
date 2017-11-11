@@ -24,8 +24,7 @@ def hello_world():
     <form method="post" enctype="multipart/form-data" action="solve">
         <fieldset>
           <input type="file" name="file">
-          <label for="tables">Number of tables</label>
-          <input type="number" name="tables" placeholder="20">
+    
           <label for="tables">Seats per table</label>
           <input type="number" name="size"
                     placeholder="10">
@@ -48,7 +47,7 @@ def solve():
         return redirect(request.url)
 
     file = request.files['file']
-    num_tables = int(request.form['tables'])
+  
     table_size = int(request.form['size'])
 
     if file.filename == '':
@@ -57,7 +56,7 @@ def solve():
     if not file or not allowed_file(file.filename):
         return redirect(request.url)
 
-    tables, persons = partition_to_tables(num_tables, table_size, file)
+    tables, persons = partition_to_tables(table_size, file)
 
     page_html = """
     <!doctype html>
@@ -69,7 +68,7 @@ def solve():
     </head>
     {}
     </html>
-    """.format(convert_tables_html(num_tables, table_size, persons, tables))
+    """.format(convert_tables_html(table_size, persons, tables))
     return app.response_class(
         response=page_html,
         status=200,
@@ -77,7 +76,9 @@ def solve():
     )
 
 
-def convert_tables_html(num_tables, table_size, persons, tables):
+def convert_tables_html(table_size, persons, tables):
+    num_tables = len(tables.keys())
+
     html = "<table>"
     headers = [str(i) for i in range(1, num_tables + 1)]
     headers_html = "<tr>" + "".join(

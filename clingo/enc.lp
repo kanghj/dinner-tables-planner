@@ -1,5 +1,6 @@
 %% persons and tables
 person(1..N) :- total_persons(N).
+total_tables(M) :- M = N / table_size, total_persons(N).
 table(1..M) :- total_tables(M).
 clique(1..C) :- cliques(C).
 

@@ -3,12 +3,13 @@ import uuid
 from collections import defaultdict
 import subprocess
 import os
+import math
 import re
 
 from werkzeug.utils import secure_filename
 
 
-def convert(path, num_tables, table_size):
+def convert(path, table_size):
 
     facts = []
 
@@ -23,8 +24,10 @@ def convert(path, num_tables, table_size):
                     persons.append(value)
                 community[key].append(persons.index(value) + 1)
 
-    facts.append('total_persons({}).'.format(len(persons)))
-    facts.append('total_tables({}).'.format(num_tables))
+    num_persons = len(persons)
+    facts.append('total_persons({}).'.format(num_persons))
+    facts.append('total_tables({}).'.format(math.ceil(num_persons / table_size)))
+  
     facts.append('cliques({}).'.format(len(community.keys())))
     clique_list = [clique for clique in community.keys()]
 
@@ -80,12 +83,12 @@ def solve_by_clingo(facts, job_id):
     return resp_text
 
 
-def partition_to_tables(num_tables, table_size, csv_file):
+def partition_to_tables(table_size, csv_file):
     job_id = str(uuid.uuid4())
 
     path = save_file(csv_file, secure_filename(csv_file.filename), job_id)
 
-    facts, persons = convert(path, num_tables, table_size)
+    facts, persons = convert(path, table_size)
     os.remove(path)
 
     resp_text = solve_by_clingo(facts, job_id)

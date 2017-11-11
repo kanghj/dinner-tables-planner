@@ -1,5 +1,4 @@
 total_persons(7).
-total_tables(10).
 cliques(3).
 
 in_clique(1..4, 1).
