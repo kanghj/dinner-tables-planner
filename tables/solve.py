@@ -26,8 +26,9 @@ def convert(path, table_size):
 
     num_persons = len(persons)
     facts.append('total_persons({}).'.format(num_persons))
-    facts.append('total_tables({}).'.format(math.ceil(num_persons / table_size)))
-  
+    facts.append('total_tables({}).'.format(
+        math.ceil(num_persons / table_size)))
+
     facts.append('cliques({}).'.format(len(community.keys())))
     clique_list = [clique for clique in community.keys()]
 

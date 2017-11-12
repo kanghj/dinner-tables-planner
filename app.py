@@ -24,7 +24,6 @@ def hello_world():
     <form method="post" enctype="multipart/form-data" action="solve">
         <fieldset>
           <input type="file" name="file">
-    
           <label for="tables">Seats per table</label>
           <input type="number" name="size"
                     placeholder="10">
@@ -47,7 +46,7 @@ def solve():
         return redirect(request.url)
 
     file = request.files['file']
-  
+
     table_size = int(request.form['size'])
 
     if file.filename == '':
