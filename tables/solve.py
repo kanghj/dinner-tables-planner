@@ -26,13 +26,16 @@ def convert(path, table_size):
 
     num_persons = len(persons)
     facts.append('total_persons({}).'.format(num_persons))
-    facts.append('total_tables({}).'.format(
-        math.ceil(num_persons / table_size)))
+    facts.append('person(1..N) :- total_persons(N).')
+    num_tables = math.ceil(num_persons / table_size)
+    facts.append('total_tables({}).'.format(num_tables))
 
     facts.append('cliques({}).'.format(len(community.keys())))
     clique_list = [clique for clique in community.keys()]
 
-    facts.append('#const table_size = {}.'.format(table_size))
+    for table_num in range(1, num_tables + 1):
+        facts.append('table_size({}, {}).'.format(table_num, 10))
+
     for community_name, members in community.items():
         for member in members:
             facts.append('in_clique({}, {}).'.format(
