@@ -1,11 +1,7 @@
-import csv
-import uuid
 from collections import defaultdict
-import subprocess
-import os
 import math
-import re
 import typing
+
 
 def pick_table_with_space(tables: typing.List[int], space_needed: int):
     for i, table in enumerate(tables):
@@ -14,12 +10,14 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int):
     return None
 
 
-def coarse_local(community: typing.Mapping[int, typing.List[int]], table_size : int):
+def coarse_local(community: typing.Mapping[int, typing.List[int]],
+                 table_size : int):
     """
     Decrease the table_size, but combine subgraphs of cliques into single node
     Return the new table sizes, updated community, mapping of coarse_node back to original nodes
     """
-    num_tables = math.ceil(sum((len(members) for key, members in community.items())) / table_size)
+    num_tables = math.ceil(sum(
+        (len(members) for key, members in community.items())) / table_size)
 
     # Here are what we will return
     new_table_sz = [table_size for i in range(0, num_tables)]
@@ -52,12 +50,11 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]], table_size : 
         clique_rep = min(members)
         coarse_to_original[clique_rep] = members
         new_community[clique].append(clique_rep)
-        
-        table_to_seat_clique = pick_table_with_space(new_table_sz, len(members))
+
+        table_to_seat_clique = pick_table_with_space(
+            new_table_sz, len(members))
         new_table_sz[table_to_seat_clique] -= len(members) - 1
-        presolved_facts.append('in_table({}, {}).'.format(clique_rep, table_to_seat_clique))
+        presolved_facts.append('in_table({}, {}).'.format(
+            clique_rep, table_to_seat_clique))
 
-    return (new_table_sz, new_community, coarse_to_original, presolved_facts)
-
-
-
+    return new_table_sz, new_community, coarse_to_original, presolved_facts
