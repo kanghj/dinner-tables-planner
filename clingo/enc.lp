@@ -1,7 +1,7 @@
 %% persons and tables
 
 
-table(1..M) :- total_tables(M).
+table(0..M-1) :- total_tables(M).
 clique(1..C) :- cliques(C).
 
 %% total_cliques(A, N) :- person(A), N = #count { in_clique(A, C) : clique(C) }.

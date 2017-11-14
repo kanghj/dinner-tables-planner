@@ -87,7 +87,7 @@ def convert_tables_html(table_size, persons, tables):
     for i in range(0, table_size):
         body_html += "<tr>"
         # for table_num, person_ids in tables.items():
-        for table_num in range(1, num_tables + 1):
+        for table_num in range(0, num_tables):
             try:
                 person_ids = tables[str(table_num)]
             except KeyError:
