@@ -11,10 +11,11 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int):
 
 
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
-                 table_size : int):
+                 table_size: int):
     """
     Decrease the table_size, but combine subgraphs of cliques into single node
-    Return the new table sizes, updated community, mapping of coarse_node back to original nodes
+    Return the new table sizes, updated community,
+     mapping of coarse_node back to original nodes, and prefined atoms
     """
     num_tables = math.ceil(sum(
         (len(members) for key, members in community.items())) / table_size)
@@ -33,11 +34,11 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             cliques_of_person[member].append(clique_name)
 
     for person, cliques in cliques_of_person.items():
+        clique = cliques[0]
         if len(cliques) > 1:
             coarse_to_original[person] = [person]
             new_community[clique].append(person)
             continue
-        clique = cliques[0]
         if len(single_clique_members[clique]) == table_size:
             # cannot add more to this clique already
             # TODO form a second representation node

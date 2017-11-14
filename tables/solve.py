@@ -28,11 +28,13 @@ def convert(path, table_size):
 
                 if value not in persons:
                     persons.append(value)
-                community[clique_names.index(key) + 1].append(persons.index(value) + 1)
+                community[clique_names.index(key) + 1].append(
+                    persons.index(value) + 1)
 
     num_persons = len(persons)
 
-    new_table_sz, new_community, coarse_to_original, presolved = coarse_local(community, table_size)
+    new_table_sz, new_community, coarse_to_original, presolved = \
+        coarse_local(community, table_size)
     # facts.append('total_persons({}).'.format(len(coarse_to_original.keys())))
 
     for key, members in coarse_to_original.items():
@@ -108,7 +110,8 @@ def partition_to_tables(table_size, csv_file):
     job_id = str(uuid.uuid4())
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        path = save_file(tmpdir, csv_file, secure_filename(csv_file.filename), job_id)
+        path = save_file(tmpdir, csv_file,
+                         secure_filename(csv_file.filename), job_id)
 
         facts, persons, coarse_nodes_to_persons = convert(path, table_size)
 
