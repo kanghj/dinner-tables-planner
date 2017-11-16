@@ -95,7 +95,7 @@ def solve_by_clingo(facts, job_id):
         for fact in facts:
             lp_file.write(fact + '\n')
 
-    proc = subprocess.Popen(['exec/clingo.exe', '-t 4',
+    proc = subprocess.Popen(['exec/clingo', '-t 4',
                              facts_file, 'clingo/enc.lp'],
                             stdout=subprocess.PIPE)
     resp_text = []
