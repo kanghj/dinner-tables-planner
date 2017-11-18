@@ -24,7 +24,6 @@ class CoarserTest(TestCase):
         self.assertTrue('in_table(0, 0).' in presolved_facts)
         self.assertTrue('in_table(8, 3).' in presolved_facts)
 
-
     def test_coarse_local_simple(self):
         community = {
             0: [0, 1, 2],
@@ -44,8 +43,7 @@ class CoarserTest(TestCase):
         self.assertTrue('in_table(0, 0).' in presolved_facts)
         self.assertTrue('in_table(9, 3).' in presolved_facts)
 
-
-    def test_coarse_local_does_not_remove_person_with_more_than_one_connection(self):
+    def test_coarse_local_does_not_remove_multiple_connected_person(self):
         community = {
             0: [0, 1, 2],
             1: [3, 4, 5, 6, 7, 2],
@@ -56,7 +54,7 @@ class CoarserTest(TestCase):
             coarse_local(community, table_size)
 
         self.assertCountEqual(new_table_sz, [1, 1, 2, 3])
-        
+
         # that 2 is still present in each clique
         for key, values in new_community.items():
             self.assertTrue(2 in values)

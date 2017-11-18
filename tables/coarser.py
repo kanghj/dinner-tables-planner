@@ -7,7 +7,7 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int):
     for i, table in enumerate(tables):
         if table >= space_needed:
             return i
-    raise Error("no table found")
+    raise ValueError("no table found")
 
 
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
@@ -25,15 +25,15 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
         (len(members) for key, members in community.items())) / table_size)
 
     new_table_sz = [table_size for i in range(0, num_tables)]
-    new_community : typing.MutableMapping[int, typing.List[int]] \
+    new_community: typing.MutableMapping[int, typing.List[int]] \
         = defaultdict(list)
     node_to_persons = {}
     presolved_facts = []
 
-    single_clique_members : typing.MutableMapping[int, typing.List[typing.List[int]]] \
-        = defaultdict(list)
+    single_clique_members: typing.MutableMapping[
+        int, typing.List[typing.List[int]]] = defaultdict(list)
 
-    cliques_of_person : typing.MutableMapping[int, typing.List[int]] = \
+    cliques_of_person: typing.MutableMapping[int, typing.List[int]] = \
         defaultdict(list)
     for clique_name, members in community.items():
         for member in members:
@@ -42,10 +42,10 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     for person, cliques in cliques_of_person.items():
         if len(cliques) > 1:
             node_to_persons[person] = [person]
-            
+
             for clique in cliques:
                 new_community[clique].append(person)
-            # this person cannot be combined with another to form a single node
+            # person cannot be combined with another to form a single node
             continue
 
         clique = cliques[0]
