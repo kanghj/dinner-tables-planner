@@ -35,11 +35,8 @@ def convert(path, table_size):
 
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)
-    # facts.append('total_persons({}).'.format(len(coarse_to_original.keys())))
 
     for key, members in coarse_to_original.items():
-        # if len(members) > 1:
-        #     continue
         facts.append('person({}).'.format(key))
 
     num_tables = math.ceil(num_persons / table_size)
@@ -55,8 +52,10 @@ def convert(path, table_size):
         for member in members:
             facts.append('in_clique({}, {}).'.format(
                 member, clique_list.index(community_name) + 1))
-    facts.extend(presolved)
 
+    for presolved_fact in presolved:
+        facts.append('{}({},{}).'.format(
+            presolved_fact[0], presolved_fact[1], presolved_fact[2]))
     return facts, persons, coarse_to_original
 
 
@@ -67,7 +66,6 @@ def parse_clingo_out(output):
         output_full = '\n'.join(output)
     else:
         output_full = output
-    print(output_full)
 
     last_answer = output_full.rfind('Answer:')
     output_last = output_full[last_answer:]
