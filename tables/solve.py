@@ -5,8 +5,11 @@ import subprocess
 import os
 import math
 import re
+import tempfile
 
 from werkzeug.utils import secure_filename
+
+from .coarser import coarse_local
 
 
 def convert(path, table_size):
@@ -18,27 +21,43 @@ def convert(path, table_size):
 
         reader = csv.DictReader(csvfile, delimiter=',')
         community = defaultdict(list)
+        clique_names = []
         for row in reader:
             for key, value in row.items():
+                clique_names.append(key)
+
                 if value not in persons:
                     persons.append(value)
-                community[key].append(persons.index(value) + 1)
+                community[clique_names.index(key) + 1].append(
+                    persons.index(value) + 1)
 
     num_persons = len(persons)
-    facts.append('total_persons({}).'.format(num_persons))
-    facts.append('total_tables({}).'.format(
-        math.ceil(num_persons / table_size)))
 
-    facts.append('cliques({}).'.format(len(community.keys())))
-    clique_list = [clique for clique in community.keys()]
+    new_table_sz, new_community, coarse_to_original, presolved = \
+        coarse_local(community, table_size)
+    # facts.append('total_persons({}).'.format(len(coarse_to_original.keys())))
 
-    facts.append('#const table_size = {}.'.format(table_size))
-    for community_name, members in community.items():
+    for key, members in coarse_to_original.items():
+        # if len(members) > 1:
+        #     continue
+        facts.append('person({}).'.format(key))
+
+    num_tables = math.ceil(num_persons / table_size)
+    facts.append('total_tables({}).'.format(num_tables))
+
+    facts.append('cliques({}).'.format(len(new_community.keys())))
+    clique_list = [clique for clique in new_community.keys()]
+
+    for table_num, table_sz in enumerate(new_table_sz):
+        facts.append('table_size({}, {}).'.format(table_num, table_sz))
+
+    for community_name, members in new_community.items():
         for member in members:
             facts.append('in_clique({}, {}).'.format(
                 member, clique_list.index(community_name) + 1))
+    facts.extend(presolved)
 
-    return facts, persons
+    return facts, persons, coarse_to_original
 
 
 def parse_clingo_out(output):
@@ -48,6 +67,7 @@ def parse_clingo_out(output):
         output_full = '\n'.join(output)
     else:
         output_full = output
+    print(output_full)
 
     last_answer = output_full.rfind('Answer:')
     output_last = output_full[last_answer:]
@@ -61,9 +81,10 @@ def parse_clingo_out(output):
     return tables
 
 
-def save_file(file, filename, job_id):
+def save_file(tmpdir_path, file, filename, job_id):
     uniq_filename = filename + '_' + job_id
-    path = os.path.join('/tmp/', uniq_filename)
+
+    path = os.path.join(tmpdir_path, uniq_filename)
     file.save(path)
     return path
 
@@ -73,6 +94,7 @@ def solve_by_clingo(facts, job_id):
     with open(facts_file, 'w+') as lp_file:
         for fact in facts:
             lp_file.write(fact + '\n')
+
     proc = subprocess.Popen(['exec/clingo', '-t 4',
                              facts_file, 'clingo/enc.lp'],
                             stdout=subprocess.PIPE)
@@ -87,11 +109,21 @@ def solve_by_clingo(facts, job_id):
 def partition_to_tables(table_size, csv_file):
     job_id = str(uuid.uuid4())
 
-    path = save_file(csv_file, secure_filename(csv_file.filename), job_id)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = save_file(tmpdir, csv_file,
+                         secure_filename(csv_file.filename), job_id)
 
-    facts, persons = convert(path, table_size)
-    os.remove(path)
+        facts, persons, coarse_nodes_to_persons = convert(path, table_size)
 
     resp_text = solve_by_clingo(facts, job_id)
 
-    return parse_clingo_out(resp_text), persons
+    coarse_tables = parse_clingo_out(resp_text)
+
+    tables = {}
+    for table_num, nodes in coarse_tables.items():
+        original_persons = []
+        for node in nodes:
+            original_persons.extend(coarse_nodes_to_persons[int(node)])
+        tables[table_num] = original_persons
+
+    return tables, persons
