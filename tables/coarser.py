@@ -13,9 +13,11 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int):
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
                  table_size: int):
     """
+    Coarses a local community of fully-connected persons.
     Decrease the table_size, but combine subgraphs of cliques into single node
     Return the new table sizes, updated community,
-     mapping of coarse_node back to original nodes, and prefined atoms
+     mapping of coarse_node back to original nodes, and
+     prefined atoms assigning the coarse nodes to tables
     """
     num_tables = math.ceil(sum(
         (len(members) for key, members in community.items())) / table_size)
