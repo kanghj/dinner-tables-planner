@@ -52,8 +52,10 @@ def convert(path, table_size):
         for member in members:
             facts.append('in_clique({}, {}).'.format(
                 member, clique_list.index(community_name) + 1))
-    facts.extend(presolved)
 
+    for presolved_fact in presolved:
+        facts.append('{}({},{}).'.format(
+            presolved_fact[0], presolved_fact[1], presolved_fact[2]))
     return facts, persons, coarse_to_original
 
 

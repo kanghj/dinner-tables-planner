@@ -21,8 +21,8 @@ class CoarserTest(TestCase):
 
         self.assertTrue(8 in coarse_to_original.keys())
 
-        self.assertTrue('in_table(0, 0).' in presolved_facts)
-        self.assertTrue('in_table(8, 3).' in presolved_facts)
+        self.assertTrue(('in_table', 0, 0) in presolved_facts)
+        self.assertTrue(('in_table', 8, 3) in presolved_facts)
 
     def test_coarse_local_simple(self):
         community = {
@@ -40,8 +40,8 @@ class CoarserTest(TestCase):
 
         self.assertTrue(9 in coarse_to_original.keys())
 
-        self.assertTrue('in_table(0, 0).' in presolved_facts)
-        self.assertTrue('in_table(9, 3).' in presolved_facts)
+        self.assertTrue(('in_table', 0, 0) in presolved_facts)
+        self.assertTrue(('in_table', 9, 3) in presolved_facts)
 
     def test_coarse_local_does_not_remove_multiple_connected_person(self):
         community = {
@@ -53,7 +53,7 @@ class CoarserTest(TestCase):
         new_table_sz, new_community, coarse_to_original, presolved_facts = \
             coarse_local(community, table_size)
 
-        self.assertCountEqual(new_table_sz, [1, 1, 2, 3])
+        self.assertCountEqual(new_table_sz, [2, 2, 2, 1])
 
         # that 2 is still present in each clique
         for key, values in new_community.items():
@@ -63,7 +63,22 @@ class CoarserTest(TestCase):
         self.assertTrue(9 in coarse_to_original.keys())
         self.assertEqual(coarse_to_original[2], [2])
 
-        self.assertTrue('in_table(0, 0).' in presolved_facts)
-        self.assertTrue('in_table(3, 1).' in presolved_facts)
-        self.assertTrue('in_table(6, 0).' in presolved_facts)
-        self.assertTrue('in_table(9, 2).' in presolved_facts)
+        self.assertTrue(('in_table', 0, 0) in presolved_facts)
+        self.assertTrue(('in_table', 3, 1) in presolved_facts)
+        self.assertTrue(('in_table', 6, 2) in presolved_facts)
+        self.assertTrue(('in_table', 9, 3) in presolved_facts)
+
+    def test_coarse_local_handles_single_person_in_node(self):
+        community = {
+            0: [0, 1, 2, 3]
+        }
+        table_size = 3
+        new_table_sz, new_community, coarse_to_original, presolved_facts = \
+            coarse_local(community, table_size)
+
+        self.assertCountEqual(new_table_sz, [1, 3])
+
+        self.assertTrue(0 in coarse_to_original.keys())
+        self.assertTrue(3 in coarse_to_original.keys())
+        self.assertEqual(coarse_to_original[3], [3])
+        self.assertTrue(('in_table', 0, 0) in presolved_facts)

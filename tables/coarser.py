@@ -3,9 +3,12 @@ import math
 import typing
 
 
-def pick_table_with_space(tables: typing.List[int], space_needed: int):
+def pick_table_with_space(tables: typing.List[int], space_needed: int,
+                          presolved_facts):
     for i, table in enumerate(tables):
-        if table >= space_needed:
+        occupied_seats_at_table = len(
+            [fact for fact in presolved_facts if fact[2] == i])
+        if table - occupied_seats_at_table >= space_needed:
             return i
     raise ValueError("no table found")
 
@@ -64,14 +67,15 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
     for clique, nodes in single_clique_members.items():
         for members in nodes:
+
             clique_rep = min(members)
             node_to_persons[clique_rep] = members
             new_community[clique].append(clique_rep)
 
             table_to_seat_clique = pick_table_with_space(
-                new_table_sz, len(members))
+                new_table_sz, len(members), presolved_facts)
             new_table_sz[table_to_seat_clique] -= len(members) - 1
-            presolved_facts.append('in_table({}, {}).'.format(
-                clique_rep, table_to_seat_clique))
+            presolved_facts.append(
+                ('in_table', clique_rep, table_to_seat_clique))
 
     return new_table_sz, new_community, node_to_persons, presolved_facts
