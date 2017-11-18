@@ -13,19 +13,20 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int):
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
                  table_size: int):
     """
-    Coarses a local community of fully-connected persons.
-    Decrease the table_size, but combine subgraphs of cliques into single node
-    Return the new table sizes, updated community,
-     mapping of coarse_node back to original nodes, and
-     prefined atoms assigning the coarse nodes to tables
+    Coarses local communities of fully-connected persons into nodes.
+    Decrease the table_size.
+    Return a tuple of 4 things:
+      ( the new table sizes,
+        updated community,
+        mapping of coarse_node back to original nodes, and
+        prefined atoms assigning the nodes to tables with decreased sizes)
     """
     num_tables = math.ceil(sum(
         (len(members) for key, members in community.items())) / table_size)
 
-    # Here are what we will return
     new_table_sz = [table_size for i in range(0, num_tables)]
     new_community = defaultdict(list)
-    coarse_to_original = {}
+    node_to_persons = {}
     presolved_facts = []
 
     single_clique_members = defaultdict(list)
@@ -38,26 +39,31 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     for person, cliques in cliques_of_person.items():
         clique = cliques[0]
         if len(cliques) > 1:
-            coarse_to_original[person] = [person]
+            node_to_persons[person] = [person]
             new_community[clique].append(person)
             continue
-        if len(single_clique_members[clique]) == table_size:
-            # cannot add more to this clique already
-            # TODO form a second representation node
-            coarse_to_original[person] = [person]
-            new_community[clique].append(person)
-            continue
-        single_clique_members[clique].append(person)
 
-    for clique, members in single_clique_members.items():
-        clique_rep = min(members)
-        coarse_to_original[clique_rep] = members
-        new_community[clique].append(clique_rep)
+        num_nodes_in_clique = len(single_clique_members[clique])
 
-        table_to_seat_clique = pick_table_with_space(
-            new_table_sz, len(members))
-        new_table_sz[table_to_seat_clique] -= len(members) - 1
-        presolved_facts.append('in_table({}, {}).'.format(
-            clique_rep, table_to_seat_clique))
+        if num_nodes_in_clique == 0 or \
+                len(single_clique_members[clique][num_nodes_in_clique - 1]) == table_size:
+            # create another node for this clique
+            num_nodes_in_clique += 1
+            single_clique_members[clique].append([])
+            assert len(single_clique_members[clique]) == num_nodes_in_clique
 
-    return new_table_sz, new_community, coarse_to_original, presolved_facts
+        single_clique_members[clique][num_nodes_in_clique - 1].append(person)
+
+    for clique, nodes in single_clique_members.items():
+        for members in nodes:
+            clique_rep = min(members)
+            node_to_persons[clique_rep] = members
+            new_community[clique].append(clique_rep)
+
+            table_to_seat_clique = pick_table_with_space(
+                new_table_sz, len(members))
+            new_table_sz[table_to_seat_clique] -= len(members) - 1
+            presolved_facts.append('in_table({}, {}).'.format(
+                clique_rep, table_to_seat_clique))
+
+    return new_table_sz, new_community, node_to_persons, presolved_facts

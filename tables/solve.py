@@ -67,7 +67,6 @@ def parse_clingo_out(output):
         output_full = '\n'.join(output)
     else:
         output_full = output
-    print(output_full)
 
     last_answer = output_full.rfind('Answer:')
     output_last = output_full[last_answer:]
