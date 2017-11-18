@@ -35,11 +35,8 @@ def convert(path, table_size):
 
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)
-    # facts.append('total_persons({}).'.format(len(coarse_to_original.keys())))
 
     for key, members in coarse_to_original.items():
-        # if len(members) > 1:
-        #     continue
         facts.append('person({}).'.format(key))
 
     num_tables = math.ceil(num_persons / table_size)
