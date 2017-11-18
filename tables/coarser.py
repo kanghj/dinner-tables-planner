@@ -16,9 +16,9 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     Coarses local communities of fully-connected persons into nodes.
     Decrease the table_size.
     Return a tuple of 4 things:
-      ( the new table sizes,
+      ( the new table sizes after combining/coarsening persons,
         updated community,
-        mapping of coarse_node back to original nodes, and
+        mapping of coarse_node back to original persons, and
         prefined atoms assigning the nodes to tables with decreased sizes)
     """
     num_tables = math.ceil(sum(
@@ -37,11 +37,15 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             cliques_of_person[member].append(clique_name)
 
     for person, cliques in cliques_of_person.items():
-        clique = cliques[0]
         if len(cliques) > 1:
             node_to_persons[person] = [person]
-            new_community[clique].append(person)
+            
+            for clique in cliques:
+                new_community[clique].append(person)
+            # this person cannot be combined with another to form a single node
             continue
+
+        clique = cliques[0]
 
         num_nodes_in_clique = len(single_clique_members[clique])
 
