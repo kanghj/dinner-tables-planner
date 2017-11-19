@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect
 
-from tables import partition_to_tables
+from tables import partition_from_file
 
 app = Flask(__name__)
 
@@ -47,7 +47,7 @@ def solve():
 
     file = request.files['file']
 
-    table_size = int(request.form['size'])
+    table_size = int(request.form['size']) if 'size' in request.form else 10 
 
     if file.filename == '':
         return redirect(request.url)
@@ -55,7 +55,7 @@ def solve():
     if not file or not allowed_file(file.filename):
         return redirect(request.url)
 
-    tables, persons = partition_to_tables(table_size, file)
+    tables, persons = partition_from_file(table_size, file)
 
     page_html = """
     <!doctype html>

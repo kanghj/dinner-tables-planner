@@ -6,4 +6,4 @@ install:
   - pip install flake8
 script: 
   - flake8 .
-  - py.test tables/test.py
+  - py.test tables/coarse_test.py

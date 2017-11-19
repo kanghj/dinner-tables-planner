@@ -12,10 +12,27 @@ from werkzeug.utils import secure_filename
 from .coarser import coarse_local
 
 
-def convert(path, table_size):
-
+def represent_in_asp(coarse_to_original, new_community, new_table_sz, num_persons, persons, presolved, table_size):
     facts = []
+    for key, members in coarse_to_original.items():
+        facts.append('person({}).'.format(key))
+    num_tables = math.ceil(num_persons / table_size)
+    facts.append('total_tables({}).'.format(num_tables))
+    facts.append('cliques({}).'.format(len(new_community.keys())))
+    clique_list = [clique for clique in new_community.keys()]
+    for table_num, table_sz in enumerate(new_table_sz):
+        facts.append('table_size({}, {}).'.format(table_num, table_sz))
+    for community_name, members in new_community.items():
+        for member in members:
+            facts.append('in_clique({}, {}).'.format(
+                member, clique_list.index(community_name) + 1))
+    for presolved_fact in presolved:
+        facts.append('{}({},{}).'.format(
+            presolved_fact[0], presolved_fact[1], presolved_fact[2]))
+    return facts, persons, coarse_to_original
 
+
+def community_and_persons_from_file(path):
     persons = []
     with open(path, 'r') as csvfile:
 
@@ -30,33 +47,7 @@ def convert(path, table_size):
                     persons.append(value)
                 community[clique_names.index(key) + 1].append(
                     persons.index(value) + 1)
-
-    num_persons = len(persons)
-
-    new_table_sz, new_community, coarse_to_original, presolved = \
-        coarse_local(community, table_size)
-
-    for key, members in coarse_to_original.items():
-        facts.append('person({}).'.format(key))
-
-    num_tables = math.ceil(num_persons / table_size)
-    facts.append('total_tables({}).'.format(num_tables))
-
-    facts.append('cliques({}).'.format(len(new_community.keys())))
-    clique_list = [clique for clique in new_community.keys()]
-
-    for table_num, table_sz in enumerate(new_table_sz):
-        facts.append('table_size({}, {}).'.format(table_num, table_sz))
-
-    for community_name, members in new_community.items():
-        for member in members:
-            facts.append('in_clique({}, {}).'.format(
-                member, clique_list.index(community_name) + 1))
-
-    for presolved_fact in presolved:
-        facts.append('{}({},{}).'.format(
-            presolved_fact[0], presolved_fact[1], presolved_fact[2]))
-    return facts, persons, coarse_to_original
+    return community, persons
 
 
 def parse_clingo_out(output):
@@ -104,24 +95,31 @@ def solve_by_clingo(facts, job_id):
     return resp_text
 
 
-def partition_to_tables(table_size, csv_file):
+def partition_from_file(table_size, csv_file):
     job_id = str(uuid.uuid4())
 
     with tempfile.TemporaryDirectory() as tmpdir:
         path = save_file(tmpdir, csv_file,
                          secure_filename(csv_file.filename), job_id)
 
-        facts, persons, coarse_nodes_to_persons = convert(path, table_size)
+        community, persons = community_and_persons_from_file(path)
 
+    return partition(community, job_id, persons, table_size)
+
+
+def partition(community, job_id, persons, table_size):
+    num_persons = len(persons)
+    new_table_sz, new_community, coarse_to_original, presolved = \
+        coarse_local(community, table_size)
+    facts, persons, coarse_nodes_to_persons = represent_in_asp(
+        coarse_to_original, new_community, new_table_sz,
+        num_persons, persons, presolved, table_size)
     resp_text = solve_by_clingo(facts, job_id)
-
     coarse_tables = parse_clingo_out(resp_text)
-
     tables = {}
     for table_num, nodes in coarse_tables.items():
         original_persons = []
         for node in nodes:
             original_persons.extend(coarse_nodes_to_persons[int(node)])
         tables[table_num] = original_persons
-
     return tables, persons
