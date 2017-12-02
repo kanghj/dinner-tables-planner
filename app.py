@@ -15,12 +15,13 @@ def hello_world():
     <!doctype html>
     <html>
     <head>
-        <title>Table Seating Planner</title>
+        <title>Dining Table Seating Chart Planner</title>
     <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
     <body>
-    <h1>Upload csv file of relationships</h1>
+    <h1>Upload CSV</h1>
+    <p>Each column consists of a header and subsequent rows are names of people</p>
     <form method="post" enctype="multipart/form-data" action="solve">
         <fieldset>
           <input type="file" name="file">
@@ -47,7 +48,10 @@ def solve():
 
     file = request.files['file']
 
-    table_size = int(request.form['size']) if 'size' in request.form else 10 
+    try:
+        table_size = int(request.form['size'])
+    except:
+        table_size = 10
 
     if file.filename == '':
         return redirect(request.url)
@@ -55,7 +59,8 @@ def solve():
     if not file or not allowed_file(file.filename):
         return redirect(request.url)
 
-    tables, persons = partition_from_file(table_size, file)
+    # tables, persons = partition_from_file(table_size, file)
+    
 
     page_html = """
     <!doctype html>

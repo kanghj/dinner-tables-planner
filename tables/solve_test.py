@@ -272,6 +272,7 @@ class SolverTest(TestCase):
         self.assertTrue([4, 6] in resulting_groups)
         self.assertTrue([7, 8, 9] in resulting_groups)
 
+    @pytest.mark.skip(reason="too slow")
     def test_partition_large(self):
 
         assert len(self.persons) == 200
@@ -282,6 +283,7 @@ class SolverTest(TestCase):
         self.assertNotEqual(resulting_groups, [])
         ## this test is successful as long as something is returned
 
+    @pytest.mark.skip(reason="too slow")
     def test_partition_large_large_clique(self):
 
         assert len(self.persons) == 200
