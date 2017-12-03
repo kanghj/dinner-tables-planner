@@ -140,10 +140,12 @@ def create_file_and_upload_to_s3(table_size, csv_file):
         num_persons, persons, presolved, table_size)
     # facts_file = write_facts_to_file(facts, job_id)
 
-    s3.Bucket('dining-tables-chart').put_object(Key='lp/{}.lp'.format(job_id),
-                                                Body='\n'.join(facts))
+    s3.put_object(Bucket='dining-tables-chart',
+                  Key='lp/{}.lp'.format(job_id),
+                  Body='\n'.join(facts))
 
-    s3.Bucket('dining-tables-solved').put_object(
+    s3.put_object(
+            Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id),
             Body=pickle.dump((persons, coarse_nodes_to_persons)))
     return job_id
@@ -173,10 +175,12 @@ def partition(community, job_id, persons, table_size):
 
 
 def ans_from_s3_ans_bucket(job_id):
-    readfile = s3.Bucket('dining-tables-solved').get_object(
+    readfile = s3.get_object(
+        Bucket='dining-tables-solved',
         Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
     persons, coarse_to_original = pickle.load(
-        s3.Bucket('dining-tables-solved').get_object(
+        s3.get_object(
+            Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id))['Body'].read())
     return get_tables_from_clingo_out(
         readfile, coarse_to_original), persons
