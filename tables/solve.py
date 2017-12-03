@@ -14,7 +14,10 @@ from .coarser import coarse_local
 
 s3 = boto3.client('s3')
 
-def represent_in_asp(coarse_to_original, new_community, new_table_sz, num_persons, persons, presolved, table_size):
+
+def represent_in_asp(coarse_to_original, new_community,
+                     new_table_sz, num_persons, persons,
+                     presolved, table_size):
     facts = []
     for key, members in coarse_to_original.items():
         facts.append('person({}).'.format(key))
@@ -140,13 +143,13 @@ def create_file_and_upload_to_s3(table_size, csv_file):
     s3.Bucket('dining-tables-chart').put_object(Key='lp/{}.lp'.format(job_id),
                                                 Body='\n'.join(facts))
 
-    s3.Bucket('dining-tables-solved')
-        .put_object(Key='pickles/{}'.format(job_id),
-                    Body=pickle.dump(coarse_nodes_to_persons))
+    s3.Bucket('dining-tables-solved').put_object(
+            Key='pickles/{}'.format(job_id),
+            Body=pickle.dump((persons, coarse_nodes_to_persons)))
     return job_id
 
 
-def get_tables_and_persons_from_clingo_out(resp_text, coarse_nodes_to_persons):
+def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
     for table_num, nodes in coarse_tables.items():
@@ -154,7 +157,7 @@ def get_tables_and_persons_from_clingo_out(resp_text, coarse_nodes_to_persons):
         for node in nodes:
             original_persons.extend(coarse_nodes_to_persons[int(node)])
         tables[table_num] = original_persons
-    return tables, persons
+    return tables
 
 
 def partition(community, job_id, persons, table_size):
@@ -165,12 +168,15 @@ def partition(community, job_id, persons, table_size):
         coarse_to_original, new_community, new_table_sz,
         num_persons, persons, presolved, table_size)
     resp_text = solve_by_clingo(facts, job_id)
-    return get_tables_and_persons_from_clingo_out(resp_text, coarse_nodes_to_persons)
+    return get_tables_from_clingo_out(
+        resp_text, coarse_nodes_to_persons), persons
 
 
 def ans_from_s3_ans_bucket(job_id):
-    readfile = s3.Bucket('dining-tables-solved')
-        .get_object(Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
-    coarse_to_original = pickle.load(
-        s3.Bucket('dining-tables-solved').get_object(Key='pickles/{}'.format(job_id))['Body'].read())
-    return get_tables_and_persons_from_clingo_out(readfile, coarse_to_original)
+    readfile = s3.Bucket('dining-tables-solved').get_object(
+        Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
+    persons, coarse_to_original = pickle.load(
+        s3.Bucket('dining-tables-solved').get_object(
+            Key='pickles/{}'.format(job_id))['Body'].read())
+    return get_tables_from_clingo_out(
+        readfile, coarse_to_original), persons

@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect
 
-from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket #, partition_from_fil
+from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = set(['csv'])
@@ -20,7 +20,9 @@ def hello_world():
     </head>
     <body>
     <h1>Upload CSV</h1>
-    <p>Each column consists of a header and subsequent rows are names of people</p>
+    <p>
+    Each column consists of a header and subsequent rows are names of people
+    </p>
     <form method="post" enctype="multipart/form-data" action="solve">
         <fieldset>
           <input type="file" name="file">
@@ -49,7 +51,7 @@ def solve():
 
     try:
         table_size = int(request.form['size'])
-    except:
+    except Exception as e:
         table_size = 10
 
     if file.filename == '':
@@ -87,7 +89,11 @@ def solve():
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
     <body>
-        Your ID is {}. Please go to this page after {} minutes and collect our proposed seating plan to your event.
+        <p>
+        Your ID is {}. 
+        Please go to this page after {} 
+        minutes and collect our proposed seating plan to your event.
+        </p>
     </body>
     """
     return app.response_class(
@@ -96,11 +102,12 @@ def solve():
         mimetype='text/html'
     )
 
+
 @app.route('/retrieve', methods=['GET'])
 def retrieve():
     job_id = request.args.get('job_id')
     tables, persons = ans_from_s3_ans_bucket(job_id)
-    table_size = max([len(seats) for seats in person.values()])
+    table_size = max([len(seats) for seats in persons.values()])
     page_html = """
     <!doctype html>
     <html>

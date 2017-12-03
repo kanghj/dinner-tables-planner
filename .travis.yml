@@ -5,5 +5,5 @@ install:
   - pip install -r requirements.txt
   - pip install flake8
 script: 
-  - flake8 .
-  - py.test tables/coarse_test.py
+  - flake8 tables/solve.py tables/coarser.py
+  - py.test tables/coarse_test.py tables/solve_test.py

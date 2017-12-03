@@ -1,6 +1,7 @@
 import uuid
 from unittest import TestCase
 from .solve import partition
+import pytest
 
 
 class SolverTest(TestCase):
