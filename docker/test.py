@@ -5,6 +5,7 @@ import urllib.parse
 import boto3
 import shutil
 import os
+import sys
 
 # os.environ['PATH'] = os.environ['PATH'] + ':' + os.environ['LAMBDA_TASK_ROOT']
 
@@ -27,7 +28,8 @@ def get_file_and_solve():
     # print("Received event: " + json.dumps(event, indent=2))
 
     bucket = 'dining-tables-chart'
-    key = urllib.parse.unquote_plus('lp/6_big.lp', encoding='utf-8')
+    path_to_file = sys.argv[1]
+    key = urllib.parse.unquote_plus(path_to_file, encoding='utf-8')
     try:
         response = s3.get_object(Bucket=bucket, Key=key)
         print(response)
@@ -48,7 +50,8 @@ def get_file_and_solve():
     ans, stderr = solve_by_clingo(atoms)
 
     ans_bucket = 'dining-tables-solved'
-    ans_key = urllib.parse.unquote_plus('6_big.ans', encoding='utf-8')
+    filename = path_to_file.split('/')[-1]
+    ans_key = urllib.parse.unquote_plus(filename + '.ans', encoding='utf-8')
     try:
         s3.put_object(Bucket=ans_bucket, Key=ans_key, Body=ans)
     except Exception as e:
