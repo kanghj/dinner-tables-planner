@@ -91,13 +91,13 @@ def solve():
     <body>
         <p>
         Your ID is {}. 
-        Please go to this page after {} 
+        Please go to <a href="retrieve?job_id={}">this page</a> after {} 
         minutes and collect our proposed seating plan to your event.
         </p>
     </body>
     """
     return app.response_class(
-        response=page_html.format(job_id, '15'),
+        response=page_html.format(job_id, job_id, '15'),
         status=200,
         mimetype='text/html'
     )
