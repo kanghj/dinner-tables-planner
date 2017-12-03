@@ -107,6 +107,26 @@ def solve():
 def retrieve():
     job_id = request.args.get('job_id')
     tables, persons = ans_from_s3_ans_bucket(job_id)
+    if tables is None:
+        return app.response_class(
+            response="""
+            <!doctype html>
+            <html>
+            <head>
+                <title>Not ready yet</title>
+                <link rel="stylesheet"
+            href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+            </head>
+            <body>
+                <p>Oops, we are not ready to show you your seating plan yet</p>
+                <p>Please come back later</p>
+                <p>If this page is still unable to load after 6 hours, please contact us!</p>
+            </body>
+            </html>
+            """,
+            status=200,
+            mimetype='text/html'
+        )
     table_size = max([len(seats) for seats in tables.values()])
     page_html = """
     <!doctype html>

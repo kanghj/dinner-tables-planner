@@ -9,6 +9,7 @@ import tempfile
 import boto3
 import json
 from werkzeug.utils import secure_filename
+from botocore.exceptions import ClientError
 
 from .coarser import coarse_local
 
@@ -124,6 +125,14 @@ def partition_from_file(table_size, csv_file):
     return partition(community, job_id, persons, table_size)
 
 
+def add_solving_atoms(facts):
+    new_facts = facts.copy()
+    with open('clingo/enc.lp') as enc_file:
+        for line in enc_file:
+            new_facts.append(line)
+    return new_facts
+
+
 def create_file_and_upload_to_s3(table_size, csv_file):
     job_id = str(uuid.uuid4())
 
@@ -141,6 +150,7 @@ def create_file_and_upload_to_s3(table_size, csv_file):
         num_persons, persons, presolved, table_size)
     # facts_file = write_facts_to_file(facts, job_id)
 
+    facts = add_solving_atoms(facts)
     s3.put_object(Bucket='dining-tables-chart',
                   Key='lp/{}.lp'.format(job_id),
                   Body='\n'.join(facts))
@@ -179,9 +189,14 @@ def partition(community, job_id, persons, table_size):
 
 
 def ans_from_s3_ans_bucket(job_id):
-    readfile = s3.get_object(
-        Bucket='dining-tables-solved',
-        Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
+    try:
+        readfile = s3.get_object(
+            Bucket='dining-tables-solved',
+            Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
+    except ClientError as ex:
+        if ex.response['Error']['Code'] == 'NoSuchKey':
+            return None, None
+
     persons, coarse_to_original = json.loads(
         s3.get_object(
             Bucket='dining-tables-solved',
