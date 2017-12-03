@@ -107,7 +107,7 @@ def solve():
 def retrieve():
     job_id = request.args.get('job_id')
     tables, persons = ans_from_s3_ans_bucket(job_id)
-    table_size = max([len(seats) for seats in persons.values()])
+    table_size = max([len(seats) for seats in tables.values()])
     page_html = """
     <!doctype html>
     <html>

@@ -157,7 +157,10 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
     for table_num, nodes in coarse_tables.items():
         original_persons = []
         for node in nodes:
-            original_persons.extend(coarse_nodes_to_persons[int(node)])
+            try:
+                original_persons.extend(coarse_nodes_to_persons[int(node)])
+            except KeyError as e:
+                original_persons.extend(coarse_nodes_to_persons[node])
         tables[table_num] = original_persons
     return tables
 
