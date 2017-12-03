@@ -1,7 +1,6 @@
 from flask import Flask, request, redirect
 
-from tables import partition_to_tables
-
+from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = set(['csv'])
@@ -15,12 +14,15 @@ def hello_world():
     <!doctype html>
     <html>
     <head>
-        <title>Table Seating Planner</title>
+        <title>Dining Table Seating Chart Planner</title>
     <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
     <body>
-    <h1>Upload csv file of relationships</h1>
+    <h1>Upload CSV</h1>
+    <p>
+    Each column consists of a header and subsequent rows are names of people
+    </p>
     <form method="post" enctype="multipart/form-data" action="solve">
         <fieldset>
           <input type="file" name="file">
@@ -47,7 +49,10 @@ def solve():
 
     file = request.files['file']
 
-    table_size = int(request.form['size'])
+    try:
+        table_size = int(request.form['size'])
+    except Exception as e:
+        table_size = 10
 
     if file.filename == '':
         return redirect(request.url)
@@ -55,8 +60,54 @@ def solve():
     if not file or not allowed_file(file.filename):
         return redirect(request.url)
 
-    tables, persons = partition_to_tables(table_size, file)
+    # tables, persons = partition_from_file(table_size, file)
 
+    # page_html = """
+    # <!doctype html>
+    # <html>
+    # <head>
+    #     <title>Tables</title>
+    #     <link rel="stylesheet"
+    # href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    # </head>
+    # {}
+    # </html>
+    # """.format(convert_tables_html(table_size, persons, tables))
+    # return app.response_class(
+    #     response=page_html,
+    #     status=200,
+    #     mimetype='text/html'
+    # )
+
+    job_id = create_file_and_upload_to_s3(table_size, file)
+    page_html = """
+    <!doctype html>
+    <html>
+    <head>
+        <title>Tables</title>
+        <link rel="stylesheet"
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    </head>
+    <body>
+        <p>
+        Your ID is {}. 
+        Please go to this page after {} 
+        minutes and collect our proposed seating plan to your event.
+        </p>
+    </body>
+    """
+    return app.response_class(
+        response=page_html.format(job_id, '15'),
+        status=200,
+        mimetype='text/html'
+    )
+
+
+@app.route('/retrieve', methods=['GET'])
+def retrieve():
+    job_id = request.args.get('job_id')
+    tables, persons = ans_from_s3_ans_bucket(job_id)
+    table_size = max([len(seats) for seats in persons.values()])
     page_html = """
     <!doctype html>
     <html>
