@@ -1,7 +1,6 @@
 from flask import Flask, request, redirect
 
-from tables import partition_from_file
-
+from tables import create_file_and_upload_to_s3 #, partition_from_fil
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = set(['csv'])
@@ -60,8 +59,25 @@ def solve():
         return redirect(request.url)
 
     # tables, persons = partition_from_file(table_size, file)
-    
 
+    # page_html = """
+    # <!doctype html>
+    # <html>
+    # <head>
+    #     <title>Tables</title>
+    #     <link rel="stylesheet"
+    # href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    # </head>
+    # {}
+    # </html>
+    # """.format(convert_tables_html(table_size, persons, tables))
+    # return app.response_class(
+    #     response=page_html,
+    #     status=200,
+    #     mimetype='text/html'
+    # )
+
+    job_id = create_file_and_upload_to_s3(table_size, file)
     page_html = """
     <!doctype html>
     <html>
@@ -70,11 +86,12 @@ def solve():
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
-    {}
-    </html>
-    """.format(convert_tables_html(table_size, persons, tables))
+    <body>
+        Your ID is {}. Please go to this page after {} minutes and collect our proposed seating plan to your event.
+    </body>
+    """
     return app.response_class(
-        response=page_html,
+        response=page_html.format(job_id, '15'),
         status=200,
         mimetype='text/html'
     )

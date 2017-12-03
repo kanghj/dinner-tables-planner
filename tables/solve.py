@@ -6,11 +6,12 @@ import os
 import math
 import re
 import tempfile
-
+import boto3
 from werkzeug.utils import secure_filename
 
 from .coarser import coarse_local
 
+s3 = boto3.client('s3')
 
 def represent_in_asp(coarse_to_original, new_community, new_table_sz, num_persons, persons, presolved, table_size):
     facts = []
@@ -77,13 +78,15 @@ def save_file(tmpdir_path, file, filename, job_id):
     file.save(path)
     return path
 
-
-def solve_by_clingo(facts, job_id):
+def write_facts_to_file(facts, job_id):
     facts_file = 'facts_' + job_id + '.lp'
     with open(facts_file, 'w+') as lp_file:
         for fact in facts:
             lp_file.write(fact + '\n')
+    return facts_file
 
+
+def get_clingo_output(facts_file):
     proc = subprocess.Popen(['exec/clingo', '-t 8',
                              '--time-limit=25',
                              facts_file, 'clingo/enc.lp'],
@@ -91,6 +94,13 @@ def solve_by_clingo(facts, job_id):
     resp_text = []
     for line in proc.stdout:
         resp_text.append(line.decode('utf-8'))
+    return resp_text
+
+
+def solve_by_clingo(facts, job_id):
+    facts_file = write_facts_to_file(facts, job_id)
+
+    resp_text = get_clingo_output(facts_file)
 
     os.remove(facts_file)
     return resp_text
@@ -108,14 +118,28 @@ def partition_from_file(table_size, csv_file):
     return partition(community, job_id, persons, table_size)
 
 
-def partition(community, job_id, persons, table_size):
+def create_file_and_upload_to_s3(table_size, csv_file):
+    job_id = str(uuid.uuid4())
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        path = save_file(tmpdir, csv_file,
+                         secure_filename(csv_file.filename), job_id)
+
+        community, persons = community_and_persons_from_file(path)
+
     num_persons = len(persons)
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
         num_persons, persons, presolved, table_size)
-    resp_text = solve_by_clingo(facts, job_id)
+    # facts_file = write_facts_to_file(facts, job_id)
+
+    s3.Bucket('dining-tables-chart').put_object(Key='lp/{}.lp'.format(job_id), Body='\n'.join(facts))
+    return job_id
+
+
+def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
     for table_num, nodes in coarse_tables.items():
@@ -124,3 +148,14 @@ def partition(community, job_id, persons, table_size):
             original_persons.extend(coarse_nodes_to_persons[int(node)])
         tables[table_num] = original_persons
     return tables, persons
+
+
+def partition(community, job_id, persons, table_size):
+    num_persons = len(persons)
+    new_table_sz, new_community, coarse_to_original, presolved = \
+        coarse_local(community, table_size)
+    facts, persons, coarse_nodes_to_persons = represent_in_asp(
+        coarse_to_original, new_community, new_table_sz,
+        num_persons, persons, presolved, table_size)
+    resp_text = solve_by_clingo(facts, job_id)
+    return get_tables_from_clingo_out(resp_text)

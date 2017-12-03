@@ -7,7 +7,7 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int,
                           presolved_facts):
     for i, table in enumerate(tables):
         occupied_seats_at_table = len(
-            [fact for fact in presolved_facts if fact[2] == i])
+            [fact for fact in presolved_facts if fact[0] == 'in_table' and fact[2] == i])
         if table - occupied_seats_at_table >= space_needed:
             return i
     raise ValueError("no table found")
@@ -16,7 +16,8 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int,
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
                  table_size: int):
     """
-    Coarses local communities of fully-connected persons into nodes.
+    Coarses local communities of 
+        fully-connected persons not connected to other cliques into nodes.
     Decrease the table_size.
     Return a tuple of 4 things:
       ( the new table sizes after combining/coarsening persons,
