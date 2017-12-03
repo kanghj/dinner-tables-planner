@@ -7,6 +7,7 @@ import math
 import re
 import tempfile
 import boto3
+import pickle
 from werkzeug.utils import secure_filename
 
 from .coarser import coarse_local
@@ -78,6 +79,7 @@ def save_file(tmpdir_path, file, filename, job_id):
     file.save(path)
     return path
 
+
 def write_facts_to_file(facts, job_id):
     facts_file = 'facts_' + job_id + '.lp'
     with open(facts_file, 'w+') as lp_file:
@@ -135,11 +137,16 @@ def create_file_and_upload_to_s3(table_size, csv_file):
         num_persons, persons, presolved, table_size)
     # facts_file = write_facts_to_file(facts, job_id)
 
-    s3.Bucket('dining-tables-chart').put_object(Key='lp/{}.lp'.format(job_id), Body='\n'.join(facts))
+    s3.Bucket('dining-tables-chart').put_object(Key='lp/{}.lp'.format(job_id),
+                                                Body='\n'.join(facts))
+
+    s3.Bucket('dining-tables-solved')
+        .put_object(Key='pickles/{}'.format(job_id),
+                    Body=pickle.dump(coarse_nodes_to_persons))
     return job_id
 
 
-def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
+def get_tables_and_persons_from_clingo_out(resp_text, coarse_nodes_to_persons):
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
     for table_num, nodes in coarse_tables.items():
@@ -158,4 +165,12 @@ def partition(community, job_id, persons, table_size):
         coarse_to_original, new_community, new_table_sz,
         num_persons, persons, presolved, table_size)
     resp_text = solve_by_clingo(facts, job_id)
-    return get_tables_from_clingo_out(resp_text)
+    return get_tables_and_persons_from_clingo_out(resp_text, coarse_nodes_to_persons)
+
+
+def ans_from_s3_ans_bucket(job_id):
+    readfile = s3.Bucket('dining-tables-solved')
+        .get_object(Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
+    coarse_to_original = pickle.load(
+        s3.Bucket('dining-tables-solved').get_object(Key='pickles/{}'.format(job_id))['Body'].read())
+    return get_tables_and_persons_from_clingo_out(readfile, coarse_to_original)

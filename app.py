@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect
 
-from tables import create_file_and_upload_to_s3 #, partition_from_fil
+from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket #, partition_from_fil
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = set(['csv'])
@@ -92,6 +92,28 @@ def solve():
     """
     return app.response_class(
         response=page_html.format(job_id, '15'),
+        status=200,
+        mimetype='text/html'
+    )
+
+@app.route('/retrieve', methods=['GET'])
+def retrieve():
+    job_id = request.args.get('job_id')
+    tables, persons = ans_from_s3_ans_bucket(job_id)
+    table_size = max([len(seats) for seats in person.values()])
+    page_html = """
+    <!doctype html>
+    <html>
+    <head>
+        <title>Tables</title>
+        <link rel="stylesheet"
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    </head>
+    {}
+    </html>
+    """.format(convert_tables_html(table_size, persons, tables))
+    return app.response_class(
+        response=page_html,
         status=200,
         mimetype='text/html'
     )
