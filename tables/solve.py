@@ -7,7 +7,7 @@ import math
 import re
 import tempfile
 import boto3
-import pickle
+import json
 from werkzeug.utils import secure_filename
 
 from .coarser import coarse_local
@@ -145,7 +145,7 @@ def create_file_and_upload_to_s3(table_size, csv_file):
 
     s3.Bucket('dining-tables-solved').put_object(
             Key='pickles/{}'.format(job_id),
-            Body=pickle.dump((persons, coarse_nodes_to_persons)))
+            Body=json.dumps((persons, coarse_nodes_to_persons)))
     return job_id
 
 
@@ -175,8 +175,9 @@ def partition(community, job_id, persons, table_size):
 def ans_from_s3_ans_bucket(job_id):
     readfile = s3.Bucket('dining-tables-solved').get_object(
         Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
-    persons, coarse_to_original = pickle.load(
-        s3.Bucket('dining-tables-solved').get_object(
-            Key='pickles/{}'.format(job_id))['Body'].read())
+    persons, coarse_to_original = json.loads(
+        s3.get_object(
+            Bucket='dining-tables-solved',
+            Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
     return get_tables_from_clingo_out(
         readfile, coarse_to_original), persons
