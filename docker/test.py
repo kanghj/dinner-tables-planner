@@ -48,6 +48,8 @@ def get_file_and_solve():
     print(atoms)
 
     ans, stderr = solve_by_clingo(atoms)
+    if stderr is not None:
+        print(stderr)
 
     ans_bucket = 'dining-tables-solved'
     filename = path_to_file.split('/')[-1]

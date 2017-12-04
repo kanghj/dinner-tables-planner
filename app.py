@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, render_template
 
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
 app = Flask(__name__)
@@ -10,31 +10,7 @@ app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
 
 @app.route('/')
 def hello_world():
-    return '''
-    <!doctype html>
-    <html>
-    <head>
-        <title>Dining Table Seating Chart Planner</title>
-    <link rel="stylesheet"
-    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
-    </head>
-    <body>
-    <h1>Upload CSV</h1>
-    <p>
-    Each column consists of a header and subsequent rows are names of people
-    </p>
-    <form method="post" enctype="multipart/form-data" action="solve">
-        <fieldset>
-          <input type="file" name="file">
-          <label for="tables">Seats per table</label>
-          <input type="number" name="size"
-                    placeholder="10">
-         <input type="submit" value="Upload">
-        </fieldset>
-    </form>
-    </body>
-    </html>
-    '''
+    return render_template('index.html')
 
 
 def allowed_file(filename):
@@ -60,25 +36,6 @@ def solve():
     if not file or not allowed_file(file.filename):
         return redirect(request.url)
 
-    # tables, persons = partition_from_file(table_size, file)
-
-    # page_html = """
-    # <!doctype html>
-    # <html>
-    # <head>
-    #     <title>Tables</title>
-    #     <link rel="stylesheet"
-    # href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
-    # </head>
-    # {}
-    # </html>
-    # """.format(convert_tables_html(table_size, persons, tables))
-    # return app.response_class(
-    #     response=page_html,
-    #     status=200,
-    #     mimetype='text/html'
-    # )
-
     job_id = create_file_and_upload_to_s3(table_size, file)
     page_html = """
     <!doctype html>
@@ -90,7 +47,7 @@ def solve():
     </head>
     <body>
         <p>
-        Your ID is {}. 
+        Your token is {}. 
         Please go to <a href="retrieve?job_id={}">this page</a> after {} 
         minutes and collect our proposed seating plan to your event.
         </p>
@@ -118,13 +75,17 @@ def retrieve():
             href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
             </head>
             <body>
-                <p>Oops, we are not ready to show you your seating plan yet</p>
-                <p>Please come back later</p>
-                <p>If this page is still unable to load after 6 hours, please contact us!</p>
+                <h1>Oops, we need more time</h1>
+                <p>Sorry, but we are not ready with
+                    your seating plan yet.</p>
+                <p>Please come back a few hours later.</p>
+                <p>
+                If you are unable to access this page even after waiting for 6 hours, 
+                let us know!</p>
             </body>
             </html>
             """,
-            status=200,
+            status=503,
             mimetype='text/html'
         )
     table_size = max([len(seats) for seats in tables.values()])
