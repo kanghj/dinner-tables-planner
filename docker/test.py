@@ -19,7 +19,7 @@ def solve_by_clingo(atoms):
 
     proc = subprocess.Popen([clingo_path, '-t 4',
                              '--time-limit=18000', '--stat'],
-                            stdout=subprocess.PIPE,  stdin=subprocess.PIPE, encoding='utf8')
+                            stdout=subprocess.PIPE,  stdin=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
 
     return proc.communicate(input = atoms)
 
