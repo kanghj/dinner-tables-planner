@@ -30,8 +30,10 @@ def represent_in_asp(coarse_to_original, new_community,
         facts.append('table_size({}, {}).'.format(table_num, table_sz))
     for community_name, members in new_community.items():
         for member in members:
-            facts.append('in_clique({}, {}).'.format(
-                member, clique_list.index(community_name) + 1))
+            fact = 'in_clique({}, {}).'.format(
+                member, clique_list.index(community_name) + 1)
+            if fact not in fact:
+                facts.append(fact)
     for presolved_fact in presolved:
         fact = '{}({},{}).'.format(
             presolved_fact[0], presolved_fact[1], presolved_fact[2])
