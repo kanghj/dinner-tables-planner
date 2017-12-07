@@ -270,8 +270,8 @@ class SolverTest(TestCase):
         # not the only right answers
         self.assertTrue([0, 5, 10] in resulting_groups)
         self.assertTrue([1, 2, 3] in resulting_groups)
-        self.assertTrue([4, 6] in resulting_groups)
-        self.assertTrue([7, 8, 9] in resulting_groups)
+        self.assertTrue([4, 6, 9] in resulting_groups)
+        self.assertTrue([7, 8] in resulting_groups)
 
     @pytest.mark.skip(reason="too slow")
     def test_partition_large(self):
