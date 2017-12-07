@@ -27,7 +27,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
         mapping of coarse_node back to original persons, and
         prefined atoms assigning the nodes to tables with decreased sizes)
     """
-    num_persons = len({member for members in community.values() for member in members})
+    num_persons = len({member for members in community.values()
+                       for member in members})
     num_tables = math.ceil(num_persons / table_size)
 
     new_table_sz = [table_size for i in range(0, num_tables)]
@@ -54,7 +55,7 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
             if count == len(cliques_of_person[member1]) and \
                     count == members_cooccurence[member2][member1] and \
-                            count == len(cliques_of_person[member2]):
+                    count == len(cliques_of_person[member2]):
 
                 coupled_persons_of_person[member1].append(member2)
 
@@ -69,7 +70,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             continue
 
         coupled_people = coupled_persons_of_person[person]
-        chunks = [coupled_people[i:i + table_size] for i in range(0, len(coupled_people), table_size)]
+        chunks = [coupled_people[i:i + table_size]
+                  for i in range(0, len(coupled_people), table_size)]
         for chunk in chunks:
 
             for clique in cliques:
@@ -99,6 +101,5 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             presolved_facts.append(
                 ('in_table', clique_rep, table_to_seat_clique))
             clique_rep_already_in_table[clique_rep] = table_to_seat_clique
-
 
     return new_table_sz, new_community, node_to_persons, presolved_facts

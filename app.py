@@ -47,8 +47,8 @@ def solve():
     </head>
     <body>
         <p>
-        Your token is {}. 
-        Please go to <a href="retrieve?job_id={}">this page</a> after {} 
+        Your token is {}.
+        Please go to <a href="retrieve?job_id={}">this page</a> after {}
         minutes and collect our proposed seating plan to your event.
         </p>
     </body>
@@ -80,7 +80,8 @@ def retrieve():
                     your seating plan yet.</p>
                 <p>Please come back a few hours later.</p>
                 <p>
-                If you are unable to access this page even after waiting for 6 hours, 
+                If you are unable to access this page even
+                after waiting for 6 hours,
                 let us know!</p>
             </body>
             </html>
