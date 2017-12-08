@@ -125,6 +125,8 @@ class CoarserTest(TestCase):
 
         print(new_community)
         print(coarse_to_original)
+        print(new_table_sz)
+        print(presolved_facts)
         self.assertCountEqual(new_table_sz, [3, 4, 4])
 
         self.assertTrue(0 in coarse_to_original.keys())
@@ -136,3 +138,18 @@ class CoarserTest(TestCase):
         self.assertTrue(('in_table', 0, 0) in presolved_facts)
         self.assertTrue(('in_table', 4, 0) in presolved_facts)
         self.assertTrue(('in_table', 7, 1) in presolved_facts)
+
+    def test_coarse_break_up_clique_if_cannot_fit(self):
+        community = {
+            0: [0, 1, 2, 3],
+            1: [2, 3, 4, 5]
+            
+        }
+        table_size = 3
+        new_table_sz, new_community, coarse_to_original, presolved_facts = \
+            coarse_local(community, table_size)
+
+        print(new_community)
+        print(coarse_to_original)
+        # a new table is created
+        self.assertCountEqual(new_table_sz, [2, 2, 2])
