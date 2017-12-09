@@ -96,7 +96,7 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             try:
                 table_to_seat_clique = pick_table_with_space(
                     new_table_sz, len(members), presolved_facts)
-            except ValueError as e:
+            except ValueError:
                 # TODO unable to seat this clique, get a new table?
                 new_table = len(new_table_sz)
                 new_table_sz.append(table_size)
