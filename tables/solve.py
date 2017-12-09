@@ -3,7 +3,6 @@ import uuid
 from collections import defaultdict
 import subprocess
 import os
-import math
 import re
 import tempfile
 import boto3
@@ -18,12 +17,12 @@ s3 = boto3.client('s3')
 
 def represent_in_asp(coarse_to_original, new_community,
                      new_table_sz, num_persons, persons,
-                     presolved, table_size):
+                     presolved):
     facts = []
     for key, members in coarse_to_original.items():
         facts.append('person({}).'.format(key))
-    num_tables = math.ceil(num_persons / table_size)
-    facts.append('total_tables({}).'.format(num_tables))
+
+    facts.append('total_tables({}).'.format(len(new_table_sz)))
     facts.append('cliques({}).'.format(len(new_community.keys())))
     clique_list = [clique for clique in new_community.keys()]
     for table_num, table_sz in enumerate(new_table_sz):
@@ -52,6 +51,9 @@ def community_and_persons_from_file(path):
         for row in reader:
             for key, value in row.items():
                 clique_names.append(key)
+
+                if len(value) == 0:
+                    continue
 
                 if value not in persons:
                     persons.append(value)
@@ -151,7 +153,7 @@ def create_file_and_upload_to_s3(table_size, csv_file):
         coarse_local(community, table_size)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        num_persons, persons, presolved, table_size)
+        num_persons, persons, presolved)
     # facts_file = write_facts_to_file(facts, job_id)
 
     facts = add_solving_atoms(facts)
@@ -186,7 +188,7 @@ def partition(community, job_id, persons, table_size):
         coarse_local(community, table_size)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        num_persons, persons, presolved, table_size)
+        num_persons, persons, presolved)
     resp_text = solve_by_clingo(facts, job_id)
     return get_tables_from_clingo_out(
         resp_text, coarse_nodes_to_persons), persons
