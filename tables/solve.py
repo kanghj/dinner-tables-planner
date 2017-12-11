@@ -69,15 +69,20 @@ def community_and_persons_from_file(path, filetype):
         wb = load_workbook(path)
         sheet = wb.get_active_sheet()
 
+        clique_names = []
         for i, column in enumerate(sheet.columns):
             col_name = None
             for j, cell in enumerate(column):
                 if j == 0:
                     col_name = cell.value
+                    clique_names.append(col_name)
                     continue
-                community[col_name].append(cell.value)
+                if cell.value is None or len(cell.value) == 0:
+                    continue
                 if cell.value not in persons:
                     persons.append(cell.value)
+                community[clique_names.index(col_name) + 1].append(
+                    persons.index(cell.value) + 1)
 
     return community, persons
 
