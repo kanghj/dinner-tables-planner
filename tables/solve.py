@@ -7,8 +7,10 @@ import re
 import tempfile
 import boto3
 import json
+
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
+from openpyxl import load_workbook
 
 from .coarser import coarse_local
 
@@ -41,24 +43,46 @@ def represent_in_asp(coarse_to_original, new_community,
     return facts, persons, coarse_to_original
 
 
-def community_and_persons_from_file(path):
+def community_and_persons_from_file(path, filetype):
     persons = []
-    with open(path, 'r') as csvfile:
 
-        reader = csv.DictReader(csvfile, delimiter=',')
-        community = defaultdict(list)
+    community = defaultdict(list)
+
+    if filetype.endswith('csv'):
+
+        with open(path, 'r') as csvfile:
+
+            reader = csv.DictReader(csvfile, delimiter=',')
+            clique_names = []
+            for row in reader:
+                for key, value in row.items():
+                    clique_names.append(key)
+
+                    if len(value) == 0:
+                        continue
+
+                    if value not in persons:
+                        persons.append(value)
+                    community[clique_names.index(key) + 1].append(
+                        persons.index(value) + 1)
+    elif filetype.endswith('xlsx'):
+        wb = load_workbook(path)
+        sheet = wb.get_active_sheet()
+
         clique_names = []
-        for row in reader:
-            for key, value in row.items():
-                clique_names.append(key)
-
-                if len(value) == 0:
+        for i, column in enumerate(sheet.columns):
+            col_name = None
+            for j, cell in enumerate(column):
+                if j == 0:
+                    col_name = cell.value
+                    clique_names.append(col_name)
                     continue
-
-                if value not in persons:
-                    persons.append(value)
-                community[clique_names.index(key) + 1].append(
-                    persons.index(value) + 1)
+                if cell.value is None or len(cell.value) == 0:
+                    continue
+                if cell.value not in persons:
+                    persons.append(cell.value)
+                community[clique_names.index(col_name) + 1].append(
+                    persons.index(cell.value) + 1)
 
     return community, persons
 
@@ -84,7 +108,7 @@ def parse_clingo_out(output):
 
 
 def save_file(tmpdir_path, file, filename, job_id):
-    uniq_filename = filename + '_' + job_id
+    uniq_filename = job_id + '_' + filename
 
     path = os.path.join(tmpdir_path, uniq_filename)
     file.save(path)
@@ -139,14 +163,16 @@ def add_solving_atoms(facts):
     return new_facts
 
 
-def create_file_and_upload_to_s3(table_size, csv_file):
+def create_file_and_upload_to_s3(table_size, uploaded_file):
     job_id = str(uuid.uuid4())
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        path = save_file(tmpdir, csv_file,
-                         secure_filename(csv_file.filename), job_id)
+        filename, file_extension = os.path.splitext(uploaded_file.filename)
+        path = save_file(tmpdir, uploaded_file,
+                         secure_filename(uploaded_file.filename), job_id)
 
-        community, persons = community_and_persons_from_file(path)
+        community, persons = community_and_persons_from_file(
+            path, file_extension)
 
     num_persons = len(persons)
     new_table_sz, new_community, coarse_to_original, presolved = \

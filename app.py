@@ -3,7 +3,7 @@ from flask import Flask, request, redirect, render_template
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
 app = Flask(__name__)
 
-ALLOWED_EXTENSIONS = set(['csv'])
+ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
 
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
 
