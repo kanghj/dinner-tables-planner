@@ -7,12 +7,11 @@
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
 </head>
 <body>
-    <h1>Upload CSV</h1>
-    <p>
-    Each column consists of a header and subsequent rows are names of people
-    </p>
+    <h1>Dining Table Seat Planner</h1>
+
     <form method="post" enctype="multipart/form-data" action="solve">
         <fieldset>
+            <label for="file">Guest List (.csv or .xlsx)</label>
           <input type="file" name="file">
           <label for="size">Seats per table</label>
           <input type="number" name="size"
@@ -20,5 +19,14 @@
          <input type="submit" value="Upload">
         </fieldset>
     </form>
+    <div>
+        <p>
+        Each column consists of a header and subsequent rows are names of people who know each other.
+
+            A single person is allowed to appear in multiple columns. E.g. "Hercule Poirot" is both a primary school
+            friend of the groom, and also a primary school friend of the bride.
+        </p>
+        <img src="static/example.png">
+    </div>
 </body>
 </html>
