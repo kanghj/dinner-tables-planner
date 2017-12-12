@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template
 
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
 
