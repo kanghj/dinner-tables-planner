@@ -1,6 +1,6 @@
-from flask import Flask, request, redirect, render_template
-
+from flask import Flask, request, redirect, render_template, send_file
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
+from excel_converter import make_workbook
 app = Flask(__name__, static_url_path='/static')
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
@@ -47,8 +47,10 @@ def solve():
     </head>
     <body>
         <p>
-        Your token is {}.
-        Please go to <a href="retrieve?job_id={}">this page</a> after {}
+        Your token is {}. Please copy and paste it somewhere.
+        </p>
+        <p>
+        Visit <a href="retrieve?job_id={}">this page</a> after {}
         minutes and collect our proposed seating plan to your event.
         </p>
     </body>
@@ -78,7 +80,7 @@ def retrieve():
                 <h1>Oops, we need more time</h1>
                 <p>Sorry, but we are not ready with
                     your seating plan yet.</p>
-                <p>Please come back a few hours later.</p>
+                <p>Please come back later.</p>
                 <p>
                 If you are unable to access this page even
                 after waiting for 6 hours,
@@ -98,9 +100,16 @@ def retrieve():
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
+    <body>
     {}
+    <div>
+        <p><a href="retrieve_as_xlsx?job_id={}">Download as an Excel file</a>
+        </p>
+    </div>
+    </body>
     </html>
-    """.format(convert_tables_html(table_size, persons, tables))
+    """.format(convert_tables_html(table_size, persons, tables),
+               job_id)
     return app.response_class(
         response=page_html,
         status=200,
@@ -138,3 +147,13 @@ def convert_tables_html(table_size, persons, tables):
 
         body_html += "</tr>"
     return html + body_html + "</table>"
+
+
+@app.route('/retrieve_as_xlsx', methods=['GET'])
+def retrieve_as_excel():
+    job_id = request.args.get('job_id')
+    tables, persons = ans_from_s3_ans_bucket(job_id)
+    bytes_xlsx = make_workbook(persons, tables)
+
+    return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",
+                     as_attachment=True)
