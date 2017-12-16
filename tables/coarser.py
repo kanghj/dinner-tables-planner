@@ -89,7 +89,6 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             new_community[clique].append(clique_rep)
 
             if clique_rep in clique_rep_already_in_table:
-
                 # already assigned this clique a table
                 continue
 
