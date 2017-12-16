@@ -206,12 +206,11 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
 
 
 def partition(community, job_id, persons, table_size):
-    num_persons = len(persons)
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        num_persons, persons, presolved)
+        persons, presolved)
     resp_text = solve_by_clingo(facts, job_id)
     return get_tables_from_clingo_out(
         resp_text, coarse_nodes_to_persons), persons
