@@ -22,4 +22,4 @@ total_cut(M) :- M = #sum { N,C : cut(C, N), clique(C) }.
 
 #minimize {C@1 : total_cut(C)}.
 
-%% #show in_table/2.
+#show in_table/2.

@@ -1,6 +1,7 @@
 total_persons(300).
 total_tables(30).
 cliques(10).
+person(1..N) :- total_persons(N).
 
 in_clique(1..40, 1).
 in_clique(41..60, 2).
@@ -13,6 +14,8 @@ in_clique(150..225, 8).
 in_clique(180..265, 9).
 in_clique(250..285, 9).
 in_clique(257..300, 10).
-
+person_size(P, 1) :- person(P).
 
 #const table_size = 10.
+
+table_size(0..30, 10).
