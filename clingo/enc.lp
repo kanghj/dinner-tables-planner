@@ -11,8 +11,8 @@ clique(1..C) :- cliques(C).
 { in_table(I, J) : table(J) } = 1 :- person(I).
 
 %% table has a maximum size
-table_occupied(J, T) :- table(J), T = #sum { F,I : person(I), in_table(I, J), person_size(I, F) }.
-:- F > S, table(J), table_size(J, S), table_occupied(J, F).
+%% table_occupied(J, T) :- table(J), T = #sum { F,I : person(I), in_table(I, J), person_size(I, F) }.
+:- #sum { F,I : person(I), in_table(I, J), person_size(I, F) } > S, table(J), table_size(J, S).
 
 %% 'cuts' counts relationships of people who are not sitting together
 cut(C, N) :- clique(C), N = { in_clique(B, C) : person(B), in_clique(A, C), person(A), table(T), in_table(A, T), not in_table(B, T) }.
