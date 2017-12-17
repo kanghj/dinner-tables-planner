@@ -123,7 +123,7 @@ def convert_tables_html(table_size, persons, tables):
     html = "<table>"
     headers = [str(i) for i in range(1, num_tables + 1)]
     headers_html = "<tr>" + "".join(
-        ["<th> Table" + j + "</th>" for j in headers]) + "</tr>"
+        ["<th> Table " + j + "</th>" for j in headers]) + "</tr>"
     html += headers_html
     body_html = ""
     for i in range(0, table_size):

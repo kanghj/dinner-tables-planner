@@ -82,7 +82,7 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
                 grouped_clique_members[clique].append(chunk)
 
-    clique_rep_already_in_table = {}
+    # clique_rep_already_in_table = {}
     for clique, groups in grouped_clique_members.items():
         for members in groups:
 
@@ -90,27 +90,28 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             node_to_persons[clique_rep] = members
             new_community[clique].append(clique_rep)
 
-            if clique_rep in clique_rep_already_in_table:
-                # already assigned this clique a table
-                continue
+            # if clique_rep in clique_rep_already_in_table:
+            #    already assigned this clique a table
+            #    continue
 
             # if this clique belongs to only one community
             # can assign them a seat directly (in an empty table)
             # since they have no links
-            if len(cliques_of_person[clique_rep]) == 1:
-                try:
-                    table_to_seat_clique = pick_table_with_space(
-                        new_table_sz, len(members), presolved_facts)
-                except ValueError:
-                    # TODO unable to seat this clique, get a new table?
-                    new_table = len(new_table_sz)
-                    new_table_sz.append(table_size)
-                    table_to_seat_clique = new_table
-
-                new_table_sz[table_to_seat_clique] -= len(members) - 1
-
-                presolved_facts.append(
-                    ('in_table', clique_rep, table_to_seat_clique))
-                clique_rep_already_in_table[clique_rep] = table_to_seat_clique
+            # if len(cliques_of_person[clique_rep]) == 1:
+            #     try:
+            #         table_to_seat_clique = pick_table_with_space(
+            #             new_table_sz, len(members), presolved_facts)
+            #     except ValueError:
+            #         # TODO unable to seat this clique, get a new table?
+            #         new_table = len(new_table_sz)
+            #         new_table_sz.append(table_size)
+            #         table_to_seat_clique = new_table
+            #
+            #     new_table_sz[table_to_seat_clique] -= len(members) - 1
+            #
+            #     presolved_facts.append(
+            #         ('in_table', clique_rep, table_to_seat_clique))
+            #     clique_rep_already_in_table[clique_rep] =
+            # table_to_seat_clique
 
     return new_table_sz, new_community, node_to_persons, presolved_facts
