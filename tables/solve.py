@@ -216,7 +216,7 @@ def partition(community, job_id, persons, table_size):
         coarse_to_original, new_community, new_table_sz,
         persons, presolved)
     resp_text = solve_by_clingo(facts, job_id)
-    print(resp_text)
+
     return get_tables_from_clingo_out(
         resp_text, coarse_nodes_to_persons), persons
 
