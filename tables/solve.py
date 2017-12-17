@@ -22,6 +22,10 @@ def represent_in_asp(coarse_to_original, new_community,
     facts = []
     for key, members in coarse_to_original.items():
         facts.append('person({}).'.format(key))
+        already_assigned_to_table = any(
+            [x[0] == 'in_table' and x[1] == key for x in presolved])
+        facts.append('person_size({}, {}).'.format(
+            key, 1 if already_assigned_to_table else len(members)))
 
     facts.append('total_tables({}).'.format(len(new_table_sz)))
     facts.append('cliques({}).'.format(len(new_community.keys())))
@@ -212,6 +216,7 @@ def partition(community, job_id, persons, table_size):
         coarse_to_original, new_community, new_table_sz,
         persons, presolved)
     resp_text = solve_by_clingo(facts, job_id)
+
     return get_tables_from_clingo_out(
         resp_text, coarse_nodes_to_persons), persons
 

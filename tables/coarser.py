@@ -12,6 +12,8 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int,
              if fact[0] == 'in_table' and fact[2] == i])
         if table - occupied_seats_at_table >= space_needed:
             return i
+        # if occupied_seats_at_table == 0:
+        #     return i
     raise ValueError("no table found")
 
 
@@ -92,19 +94,23 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
                 # already assigned this clique a table
                 continue
 
-            try:
-                table_to_seat_clique = pick_table_with_space(
-                    new_table_sz, len(members), presolved_facts)
-            except ValueError:
-                # TODO unable to seat this clique, get a new table?
-                new_table = len(new_table_sz)
-                new_table_sz.append(table_size)
-                table_to_seat_clique = new_table
+            # if this clique belongs to only one community
+            # can assign them a seat directly (in an empty table)
+            # since they have no links
+            if len(cliques_of_person[clique_rep]) == 1:
+                try:
+                    table_to_seat_clique = pick_table_with_space(
+                        new_table_sz, len(members), presolved_facts)
+                except ValueError:
+                    # TODO unable to seat this clique, get a new table?
+                    new_table = len(new_table_sz)
+                    new_table_sz.append(table_size)
+                    table_to_seat_clique = new_table
 
-            new_table_sz[table_to_seat_clique] -= len(members) - 1
+                new_table_sz[table_to_seat_clique] -= len(members) - 1
 
-            presolved_facts.append(
-                ('in_table', clique_rep, table_to_seat_clique))
-            clique_rep_already_in_table[clique_rep] = table_to_seat_clique
+                presolved_facts.append(
+                    ('in_table', clique_rep, table_to_seat_clique))
+                clique_rep_already_in_table[clique_rep] = table_to_seat_clique
 
     return new_table_sz, new_community, node_to_persons, presolved_facts
