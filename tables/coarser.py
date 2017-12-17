@@ -91,8 +91,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             new_community[clique].append(clique_rep)
 
             # if clique_rep in clique_rep_already_in_table:
-                # already assigned this clique a table
-                # continue
+            #    already assigned this clique a table
+            #    continue
 
             # if this clique belongs to only one community
             # can assign them a seat directly (in an empty table)
@@ -111,6 +111,7 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             #
             #     presolved_facts.append(
             #         ('in_table', clique_rep, table_to_seat_clique))
-            #     clique_rep_already_in_table[clique_rep] = table_to_seat_clique
+            #     clique_rep_already_in_table[clique_rep] =
+            # table_to_seat_clique
 
     return new_table_sz, new_community, node_to_persons, presolved_facts

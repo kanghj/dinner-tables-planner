@@ -264,7 +264,7 @@ class SolverTest(TestCase):
         assert len(persons) == 11
         tables, persons = partition(community, str(uuid.uuid4()), persons, 3)
 
-        resulting_groups = [values for values in tables.values()]
+        resulting_groups = [sorted(values) for values in tables.values()]
         print(resulting_groups)
 
         # these are not the only right answers, there can be other right ones
