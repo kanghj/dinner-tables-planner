@@ -16,10 +16,14 @@ clique(1..C) :- cliques(C).
 
 %% 'cuts' counts relationships of people who are not sitting together
 cut(C, N) :- clique(C), N = { in_clique(B, C) : person(B), in_clique(A, C), person(A), table(T), in_table(A, T), not in_table(B, T) }.
-total_cut(M) :- M = #sum { N,C : cut(C, N), clique(C) }.
+%% weighted_cuts(C, N * W) :- cut(C, N), clique_weight(C, W).
+total_cut(M) :- M = #sum { N * W, C : cut(C, N), clique(C), clique_weight(C, W)}.
 
 %% #minimize {(in_table(A,T), in_table(B,Q))@0 : table(T), table(Q), person(A), person(B), in_clique(A, C), in_clique(B, C), total_cliques(A, 1), total_cliques(B, 1) }.
 
 #minimize {C@1 : total_cut(C)}.
 
 #show in_table/2.
+
+#show clique_weight/2.
+#show cut/2.
