@@ -33,11 +33,13 @@ def represent_in_asp(coarse_to_original, new_community,
     for table_num, table_sz in enumerate(new_table_sz):
         facts.append('table_size({}, {}).'.format(table_num, table_sz))
     for community_name, members in new_community.items():
+        clique_number = clique_list.index(community_name) + 1
         for member in members:
             fact = 'in_clique({}, {}).'.format(
-                member, clique_list.index(community_name) + 1)
+                member, clique_number)
             if fact not in facts:
                 facts.append(fact)
+                facts.append('clique_weight({}, 1).'.format(clique_number))
     for presolved_fact in presolved:
         fact = '{}({},{}).'.format(
             presolved_fact[0], presolved_fact[1], presolved_fact[2])
