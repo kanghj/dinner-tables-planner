@@ -25,7 +25,23 @@ total_cut(M) :- M = #sum { N, C : cut(C, N), clique(C), clique_weight(C, W)}.
 
 #minimize {C@1 : total_cut(C)}.
 
+%% prevent people from sitting alone without anyone they know
+minimum_isolation_size(1).
+
+
+%% counter(C, A, P) :- clique(C), in_clique(A, C), P = {person(B) :in_clique(B, C) , in_table(A, T), in_table(B, T), table(T)}.
+
+violates_isolation_rule(C, A) :- clique(C), in_clique(A, C), {person(B) : in_clique(B, C), in_table(A, T), in_table(B, T), table(T)} <= S, minimum_isolation_size(S).
+
+clique_size(C, N) :- clique(C), N = {in_clique(A, C)}.
+
+has_violation(C) :- violates_isolation_rule(C, _), N > S, clique_size(C, N), minimum_isolation_size(S).
+:- has_violation(_).
+
 #show in_table/2.
 
 %% #show clique_weight/2.
 %% #show cut/2.
+%% #show violates_isolation_rule/2.
+%% #show has_violation/1.
+%% #show counter/3.
