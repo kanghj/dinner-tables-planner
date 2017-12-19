@@ -6,4 +6,8 @@ numbers(1..50).
 :- #sum { X: pick(X)} <     30.
 
 
+hhh :- b, a.
+b.
+
 :- X < 5, pick(X).
+
