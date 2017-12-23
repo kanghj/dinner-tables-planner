@@ -65,7 +65,7 @@ def solve():
 @app.route('/retrieve', methods=['GET'])
 def retrieve():
     job_id = request.args.get('job_id')
-    tables, persons = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original = ans_from_s3_ans_bucket(job_id)
     if tables is None:
         return app.response_class(
             response="""
@@ -108,7 +108,7 @@ def retrieve():
     </div>
     </body>
     </html>
-    """.format(convert_tables_html(table_size, persons, tables),
+    """.format(convert_tables_html(table_size, persons, tables, coarse_to_original),
                job_id)
     return app.response_class(
         response=page_html,
@@ -117,8 +117,22 @@ def retrieve():
     )
 
 
-def convert_tables_html(table_size, persons, tables):
+def convert_tables_html(table_size, persons, tables, coarse_to_original):
+    import random
+    r = lambda: random.randint(0,255)
+
     num_tables = len(tables.keys())
+
+    colours = {}
+    for key in coarse_to_original.keys():
+        colour = '#%02X%02X%02X' % (r(),r(),r())
+        colours[key] = colour
+
+
+    original_to_coarse = {}
+    for key, items in coarse_to_original.items():
+        for item in items:
+            original_to_coarse[item] = key
 
     html = "<table>"
     headers = [str(i) for i in range(1, num_tables + 1)]
@@ -143,7 +157,8 @@ def convert_tables_html(table_size, persons, tables):
 
             person_name = persons[int(person_id) - 1]
 
-            body_html += '<td>' + person_name + '</td>'
+            colour = colours[original_to_coarse[int(person_id)]]
+            body_html += '<td class="' + colour + '">' + person_name + '</td>'
 
         body_html += "</tr>"
     return html + body_html + "</table>"
@@ -152,7 +167,7 @@ def convert_tables_html(table_size, persons, tables):
 @app.route('/retrieve_as_xlsx', methods=['GET'])
 def retrieve_as_excel():
     job_id = request.args.get('job_id')
-    tables, persons = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original = ans_from_s3_ans_bucket(job_id)
     bytes_xlsx = make_workbook(persons, tables)
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",

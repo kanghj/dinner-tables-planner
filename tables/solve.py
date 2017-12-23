@@ -34,12 +34,21 @@ def represent_in_asp(coarse_to_original, new_community,
         facts.append('table_size({}, {}).'.format(table_num, table_sz))
     for community_name, members in new_community.items():
         clique_number = clique_list.index(community_name) + 1
+
+        clique_weight_fact = 'clique_weight({}, 1).'.format(clique_number)
+        if clique_weight_fact not in facts:
+            facts.append(clique_weight_fact)
+        clique_size_fact = 'clique_size({}, {}).'.format(
+            clique_number, len(members))
+        if clique_size_fact not in facts:
+            facts.append(clique_size_fact)
+
         for member in members:
             fact = 'in_clique({}, {}).'.format(
                 member, clique_number)
             if fact not in facts:
                 facts.append(fact)
-                facts.append('clique_weight({}, 1).'.format(clique_number))
+
     for presolved_fact in presolved:
         fact = '{}({},{}).'.format(
             presolved_fact[0], presolved_fact[1], presolved_fact[2])
@@ -217,6 +226,7 @@ def partition(community, job_id, persons, table_size):
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
         persons, presolved)
+
     resp_text = solve_by_clingo(facts, job_id)
 
     return get_tables_from_clingo_out(
@@ -230,7 +240,7 @@ def ans_from_s3_ans_bucket(job_id):
             Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
     except ClientError as ex:
         if ex.response['Error']['Code'] == 'NoSuchKey':
-            return None, None
+            return None, None, None
 
     persons, coarse_to_original = json.loads(
         s3.get_object(
@@ -238,4 +248,4 @@ def ans_from_s3_ans_bucket(job_id):
             Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
 
     return get_tables_from_clingo_out(
-        readfile, coarse_to_original), persons
+        readfile, coarse_to_original), persons, coarse_to_original
