@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tables</title>
+        <link rel="stylesheet"
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    <style>
+        .community-tag {
+            display:block;
+        }
+    </style>
+</head>
+<body>
+
+    {{ result.table | safe}}
+    <div>
+        <p><a href="retrieve_as_xlsx?job_id={{ result.job_id }}">Download as an Excel file</a>
+        </p>
+    </div>
+
+</body>
+</html>

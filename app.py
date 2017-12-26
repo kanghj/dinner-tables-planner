@@ -98,35 +98,15 @@ def retrieve():
         )
     table_size = max([len(seats) for seats in tables.values()])
 
-    body_html = convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names)
-    page_html = """
-    <!doctype html>
-    <html>
-    <head>
-        <title>Tables</title>
-        <link rel="stylesheet"
-    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
-    <style>
-        .community-tag {{
-            display:block;
-        }}
-    </style>
-    </head>
-    <body>
-    {}
-    <div>
-        <p><a href="retrieve_as_xlsx?job_id={}">Download as an Excel file</a>
-        </p>
-    </div>
-    </body>
-    </html>
-    """.format(body_html,
-               job_id)
-    return app.response_class(
-        response=page_html,
-        status=200,
-        mimetype='text/html'
+    table_html = convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names)
+
+    return render_template('retrieve.html',
+                           result = {
+                            'table' : table_html,
+                            'job_id' : job_id
+                           }
     )
+
 
 
 def convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names):
@@ -177,11 +157,10 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
 
             body_html += '<td class="{}">'.format('has-multiple' if len(communities) > 0 else '')
             body_html += person_name
- 
-            if len(communities) > 1:
-                for community in communities:
-                    colour = colours[community]
-                    body_html += '<small class="community-tag" style="color:' + colour + '">' + clique_names[int(community) - 1] + '</span>'
+
+            for community in communities:
+                colour = colours[community]
+                body_html += '<small class="community-tag" style="color:' + colour + '">' + clique_names[int(community) - 1] + '</span>'
 
             body_html += '</td>'
 
