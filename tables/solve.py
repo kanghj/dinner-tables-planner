@@ -98,7 +98,7 @@ def community_and_persons_from_file(path, filetype):
                 community[clique_names.index(col_name) + 1].append(
                     persons.index(cell.value) + 1)
 
-    return community, persons
+    return community, persons, clique_names
 
 
 def parse_clingo_out(output):
@@ -185,7 +185,7 @@ def create_file_and_upload_to_s3(table_size, uploaded_file):
         path = save_file(tmpdir, uploaded_file,
                          secure_filename(uploaded_file.filename), job_id)
 
-        community, persons = community_and_persons_from_file(
+        community, persons, clique_names = community_and_persons_from_file(
             path, file_extension)
 
     new_table_sz, new_community, coarse_to_original, presolved = \
@@ -202,7 +202,8 @@ def create_file_and_upload_to_s3(table_size, uploaded_file):
     s3.put_object(
             Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id),
-            Body=json.dumps((persons, coarse_nodes_to_persons)))
+            Body=json.dumps((persons, coarse_nodes_to_persons,
+                             clique_names, new_community)))
     return job_id
 
 
@@ -240,12 +241,12 @@ def ans_from_s3_ans_bucket(job_id):
             Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
     except ClientError as ex:
         if ex.response['Error']['Code'] == 'NoSuchKey':
-            return None, None, None
+            return None, None, None, None, None
 
-    persons, coarse_to_original = json.loads(
+    persons, coarse_to_original, clique_names, new_community = json.loads(
         s3.get_object(
             Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
 
-    return get_tables_from_clingo_out(
-        readfile, coarse_to_original), persons, coarse_to_original
+    return get_tables_from_clingo_out(readfile, coarse_to_original), \
+        persons, coarse_to_original, new_community, clique_names
