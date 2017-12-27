@@ -202,7 +202,8 @@ def create_file_and_upload_to_s3(table_size, uploaded_file):
     s3.put_object(
             Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id),
-            Body=json.dumps((persons, coarse_nodes_to_persons, clique_names, new_community)))
+            Body=json.dumps((persons, coarse_nodes_to_persons,
+                             clique_names, new_community)))
     return job_id
 
 
@@ -247,5 +248,5 @@ def ans_from_s3_ans_bucket(job_id):
             Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
 
-    return get_tables_from_clingo_out(
-        readfile, coarse_to_original), persons, coarse_to_original, new_community, clique_names
+    return get_tables_from_clingo_out(readfile, coarse_to_original), \
+        persons, coarse_to_original, new_community, clique_names
