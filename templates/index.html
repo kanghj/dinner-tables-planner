@@ -14,6 +14,7 @@
     {% endif %}
 
     <article>
+        <h2>Submit Guest List</h2>
         <form method="post" enctype="multipart/form-data" action="solve">
             <fieldset>
                 <label for="file">Guest List (.csv or .xlsx)</label>
@@ -30,13 +31,15 @@
         <h2>Instructions</h2>
         <p>
             Each column consists of a header and subsequent rows are names of people who know each other.
-
-            A single person is allowed to appear in multiple columns. E.g. "Hercule Poirot" is both a primary school
-            friend of the groom, and also a primary school friend of the bride.
+        </p>
+        <p>
+            A single person is allowed to appear in multiple columns.
+            E.g. "Hercule Poirot" is a classmate to both the groom and the bride.
         </p>
         <img src="static/example.PNG">
     </div>
     <article>
+        <h2>Retrieve Results</h2>
         <p>
         Already have a token to retrieve a seating plan with?
 
