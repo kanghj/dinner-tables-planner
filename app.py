@@ -1,7 +1,16 @@
-from flask import Flask, request, redirect, render_template, send_file
-from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
+import sys
+import uuid
+
+import os
+from flask import Flask, request, redirect, render_template, send_file, session
+from werkzeug.exceptions import abort
+
+from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job
 from excel_converter import make_workbook
+import random
+from collections import defaultdict
 app = Flask(__name__, static_url_path='/static')
+app.secret_key = os.environ['FLASK_SECRET']
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
 
@@ -10,7 +19,8 @@ app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
 
 @app.route('/')
 def hello_world():
-    return render_template('index.html')
+
+    return render_template('index.html', result = {'deleted_msg' : request.args.get('message')})
 
 
 def allowed_file(filename):
@@ -50,7 +60,7 @@ def solve():
         Your token is {}. Please copy and paste it somewhere.
         </p>
         <p>
-        Visit <a href="retrieve?job_id={}">this page</a> after {}
+        Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after {}
         minutes and collect our proposed seating plan to your event.
         </p>
     </body>
@@ -65,8 +75,9 @@ def solve():
 @app.route('/retrieve', methods=['GET'])
 def retrieve():
     job_id = request.args.get('job_id')
-    tables, persons, coarse_to_original = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
     if tables is None:
+        from_submit_page = request.args.get('from_submit_page')
         return app.response_class(
             response="""
             <!doctype html>
@@ -81,58 +92,50 @@ def retrieve():
                 <p>Sorry, but we are not ready with
                     your seating plan yet.</p>
                 <p>Please come back later.</p>
+                <p>{}</p>
                 <p>
                 If you are unable to access this page even
                 after waiting for 6 hours,
                 let us know!</p>
             </body>
             </html>
-            """,
+            """.format('' if from_submit_page else 'Please also check that you used the right token'),
             status=503,
             mimetype='text/html'
         )
     table_size = max([len(seats) for seats in tables.values()])
-    page_html = """
-    <!doctype html>
-    <html>
-    <head>
-        <title>Tables</title>
-        <link rel="stylesheet"
-    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
-    </head>
-    <body>
-    {}
-    <div>
-        <p><a href="retrieve_as_xlsx?job_id={}">Download as an Excel file</a>
-        </p>
-    </div>
-    </body>
-    </html>
-    """.format(convert_tables_html(table_size, persons, tables, coarse_to_original),
-               job_id)
-    return app.response_class(
-        response=page_html,
-        status=200,
-        mimetype='text/html'
+
+    table_html = convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names)
+
+    return render_template('retrieve.html',
+                           result = {
+                            'table' : table_html,
+                            'job_id' : job_id
+                           }
     )
 
 
-def convert_tables_html(table_size, persons, tables, coarse_to_original):
-    import random
-    r = lambda: random.randint(0,255)
+
+def convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names):
+    def r():
+        return random.randint(0,255)
 
     num_tables = len(tables.keys())
 
     colours = {}
-    for key in coarse_to_original.keys():
-        colour = '#%02X%02X%02X' % (r(),r(),r())
-        colours[key] = colour
-
-
     original_to_coarse = {}
+    coarse_to_community = defaultdict(list)
     for key, items in coarse_to_original.items():
         for item in items:
             original_to_coarse[item] = key
+    for community_key, members in new_community.items():
+        for member in members:
+            coarse_to_community[member].append(community_key)
+    
+    for community_key in new_community.keys():        
+        colour = '#%02X%02X%02X' % (r(),r(),r())
+        colours[community_key] = colour
+
 
     html = "<table>"
     headers = [str(i) for i in range(1, num_tables + 1)]
@@ -157,18 +160,50 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original):
 
             person_name = persons[int(person_id) - 1]
 
-            colour = colours[original_to_coarse[int(person_id)]]
-            body_html += '<td class="' + colour + '">' + person_name + '</td>'
+            communities = coarse_to_community[int(original_to_coarse[person_id])]
+
+            body_html += '<td class="{}">'.format('has-multiple' if len(communities) > 0 else '')
+            body_html += person_name
+
+            for community in communities:
+                colour = colours[community]
+                body_html += '<small class="community-tag" style="color:' + colour + '">' + clique_names[int(community) - 1] + '</span>'
+
+            body_html += '</td>'
 
         body_html += "</tr>"
+
     return html + body_html + "</table>"
 
 
 @app.route('/retrieve_as_xlsx', methods=['GET'])
 def retrieve_as_excel():
     job_id = request.args.get('job_id')
-    tables, persons, coarse_to_original = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original, new_community = ans_from_s3_ans_bucket(job_id)
     bytes_xlsx = make_workbook(persons, tables)
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",
                      as_attachment=True)
+
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    job_id = request.form['job_id']
+    delete_job(job_id)
+
+    return redirect('/?message=deleted')
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
+
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = str(uuid.uuid4())
+    return session['_csrf_token']
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
