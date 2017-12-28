@@ -250,3 +250,18 @@ def ans_from_s3_ans_bucket(job_id):
 
     return get_tables_from_clingo_out(readfile, coarse_to_original), \
         persons, coarse_to_original, new_community, clique_names
+
+
+def delete_job(job_id):
+    """
+    Deletes s3 files relating to job_id.
+    TODO Should kill any Batch program too
+    :param job_id:
+    :return:
+    """
+    s3.delete_object(Bucket='dining-tables-solved',
+                     Key='{}.lp.ans'.format(job_id))
+    s3.delete_object(Bucket='dining-tables-solved',
+                     Key='pickles/{}'.format(job_id),)
+    s3.delete_object(Bucket='dining-tables-chart',
+                     Key='lp/{}.lp'.format(job_id))

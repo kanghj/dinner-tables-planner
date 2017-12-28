@@ -9,15 +9,20 @@
 <body>
     <h1>Dining Table Seat Planner</h1>
 
+    {% if result.deleted_msg %}
+        <p>The seating plan has been deleted.</p>
+    {% endif %}
+
     <article>
         <form method="post" enctype="multipart/form-data" action="solve">
             <fieldset>
                 <label for="file">Guest List (.csv or .xlsx)</label>
-              <input type="file" name="file">
-              <label for="size">Seats per table</label>
-              <input type="number" name="size"
+                <input type="file" name="file">
+                <label for="size">Seats per table</label>
+                <input type="number" name="size"
                         placeholder="10">
-             <input type="submit" value="Upload">
+                <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+                <input type="submit" value="Upload">
             </fieldset>
         </form>
     </article>

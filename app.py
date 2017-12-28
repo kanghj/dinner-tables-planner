@@ -1,10 +1,16 @@
 import sys
-from flask import Flask, request, redirect, render_template, send_file
-from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket
+import uuid
+
+import os
+from flask import Flask, request, redirect, render_template, send_file, session
+from werkzeug.exceptions import abort
+
+from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job
 from excel_converter import make_workbook
 import random
 from collections import defaultdict
 app = Flask(__name__, static_url_path='/static')
+app.secret_key = os.environ['FLASK_SECRET']
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
 
@@ -13,7 +19,8 @@ app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
 
 @app.route('/')
 def hello_world():
-    return render_template('index.html')
+
+    return render_template('index.html', result = {'deleted_msg' : request.args.get('message')})
 
 
 def allowed_file(filename):
@@ -177,3 +184,26 @@ def retrieve_as_excel():
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",
                      as_attachment=True)
+
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    job_id = request.form['job_id']
+    delete_job(job_id)
+
+    return redirect('/?message=deleted')
+
+@app.before_request
+def csrf_protect():
+    if request.method == "POST":
+        token = session.pop('_csrf_token', None)
+        if not token or token != request.form.get('_csrf_token'):
+            abort(403)
+
+
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = str(uuid.uuid4())
+    return session['_csrf_token']
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
