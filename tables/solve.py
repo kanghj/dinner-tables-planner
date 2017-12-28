@@ -260,8 +260,8 @@ def delete_job(job_id):
     :return:
     """
     s3.delete_object(Bucket='dining-tables-solved',
-            Key='{}.lp.ans'.format(job_id))
+                     Key='{}.lp.ans'.format(job_id))
     s3.delete_object(Bucket='dining-tables-solved',
-                  Key='pickles/{}'.format(job_id),)
+                     Key='pickles/{}'.format(job_id),)
     s3.delete_object(Bucket='dining-tables-chart',
-                  Key='lp/{}.lp'.format(job_id))
+                     Key='lp/{}.lp'.format(job_id))
