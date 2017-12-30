@@ -177,7 +177,8 @@ def add_solving_atoms(facts):
     return new_facts
 
 
-def create_file_and_upload_to_s3(table_size, uploaded_file):
+def create_staging_file_and_upload_to_s3(table_size, uploaded_file):
+
     job_id = str(uuid.uuid4())
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -187,6 +188,22 @@ def create_file_and_upload_to_s3(table_size, uploaded_file):
 
         community, persons, clique_names = community_and_persons_from_file(
             path, file_extension)
+
+    s3.put_object(
+        Bucket='dining-tables-chart',
+        Key='pickles/{}'.format(job_id),
+        Body=json.dumps((community, persons, clique_names, table_size)))
+
+    return job_id, community, persons, clique_names
+
+
+def create_file_and_upload_to_s3(job_id, clique_weights):
+
+
+    community, persons, clique_names, table_size = json.loads(
+        s3.get_object(
+            Bucket='dining-tables-chart',
+            Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
 
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)

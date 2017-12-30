@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <title>Dining Table Seating Planner</title>
     <link rel="stylesheet"
-    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
 </head>
 <body>
-    <h1>Dining Table Seat Planner</h1>
-
     {% if result.deleted_msg %}
         <p>The seating plan has been deleted.</p>
     {% endif %}
+    <h1>Dining Table Seat Planner</h1>
 
     <article>
         <h2>Submit Guest List</h2>
-        <form method="post" enctype="multipart/form-data" action="solve">
+        <form method="post" enctype="multipart/form-data" action="review">
             <fieldset>
                 <label for="file">Guest List (.csv or .xlsx)</label>
                 <input type="file" name="file">
