@@ -1,6 +1,6 @@
 import uuid
 from unittest import TestCase
-from .solve import partition
+from .solve import partition, community_and_persons_from_file
 import pytest
 
 
@@ -272,4 +272,3 @@ class SolverTest(TestCase):
         self.assertTrue([1, 2, 3] in resulting_groups)
         self.assertTrue([4, 6] in resulting_groups)
         self.assertTrue([7, 8, 9] in resulting_groups)
-
