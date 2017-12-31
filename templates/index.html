@@ -5,7 +5,9 @@
     <title>Dining Table Seating Planner</title>
     <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
-    <link rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
+    <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
+    <script defer src="static/common.js"></script>
 </head>
 <body>
     {% if result.deleted_msg %}
@@ -17,10 +19,10 @@
         <h2>Submit Guest List</h2>
         <form method="post" enctype="multipart/form-data" action="review">
             <fieldset>
-                <label for="file">Guest List (.csv or .xlsx)</label>
-                <input type="file" name="file">
-                <label for="size">Seats per table</label>
-                <input type="number" name="size"
+                <label for="file-upload">Guest List (.csv or .xlsx)</label>
+                <input id="file-upload" type="file" name="file">
+                <label for="table-size">Seats per table</label>
+                <input id="table-size" type="number" name="size"
                         placeholder="10">
                 <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
                 <input type="submit" value="Upload">
@@ -52,5 +54,6 @@
             </fieldset>
         </form>
     </article>
+
 </body>
 </html>
