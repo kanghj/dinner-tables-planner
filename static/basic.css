@@ -28,5 +28,9 @@
     margin-right:auto;
 }
 .red {
-    background-color: red;
+    background: red;
+}
+
+.hide {
+    display:none;
 }

@@ -85,7 +85,7 @@ def solve():
     </head>
     <body>
         <p>
-        Your token is {}. Please copy and paste it somewhere for future reference.
+        Your token is <strong>{}</strong>. Please copy and paste it somewhere for future reference.
         </p>
         <p>
         Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after {}
@@ -123,7 +123,7 @@ def retrieve():
                 <p>{}</p>
                 <p>
                 If you are unable to access this page even
-                after waiting for 6 hours,
+                after waiting for about 6 hours,
                 let us know!</p>
             </body>
             </html>
@@ -204,8 +204,8 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
 
 @app.route('/retrieve_as_xlsx', methods=['POST'])
 def retrieve_as_excel():
-    job_id = request.args.get('job_id')
-    tables, persons, coarse_to_original, new_community = ans_from_s3_ans_bucket(job_id)
+    job_id = request.form['job_id']
+    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
     bytes_xlsx = make_workbook(persons, tables)
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",
