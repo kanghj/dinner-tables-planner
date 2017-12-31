@@ -18,7 +18,7 @@ s3 = boto3.client('s3')
 
 
 def represent_in_asp(coarse_to_original, new_community,
-                     new_table_sz, persons, presolved):
+                     new_table_sz, persons, presolved, clique_weights):
     facts = []
     for key, members in coarse_to_original.items():
         facts.append('person({}).'.format(key))
@@ -32,10 +32,14 @@ def represent_in_asp(coarse_to_original, new_community,
     clique_list = [clique for clique in new_community.keys()]
     for table_num, table_sz in enumerate(new_table_sz):
         facts.append('table_size({}, {}).'.format(table_num, table_sz))
+
     for community_name, members in new_community.items():
         clique_number = clique_list.index(community_name) + 1
 
-        clique_weight_fact = 'clique_weight({}, 1).'.format(clique_number)
+        weight = clique_weights[community_name]\
+            if community_name in clique_weights else 1
+        clique_weight_fact = 'clique_weight({}, {}).'.format(
+            clique_number, weight)
         if clique_weight_fact not in facts:
             facts.append(clique_weight_fact)
         clique_size_fact = 'clique_size({}, {}).'.format(
@@ -54,6 +58,7 @@ def represent_in_asp(coarse_to_original, new_community,
             presolved_fact[0], presolved_fact[1], presolved_fact[2])
         if fact not in facts:
             facts.append(fact)
+
     return facts, persons, coarse_to_original
 
 
@@ -177,7 +182,8 @@ def add_solving_atoms(facts):
     return new_facts
 
 
-def create_file_and_upload_to_s3(table_size, uploaded_file):
+def create_staging_file_and_upload_to_s3(table_size, uploaded_file):
+
     job_id = str(uuid.uuid4())
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -188,11 +194,30 @@ def create_file_and_upload_to_s3(table_size, uploaded_file):
         community, persons, clique_names = community_and_persons_from_file(
             path, file_extension)
 
+    s3.put_object(
+        Bucket='dining-tables-chart',
+        Key='pickles/{}'.format(job_id),
+        Body=json.dumps((community, persons, clique_names, table_size)))
+
+    return job_id, community, persons, clique_names
+
+
+def create_file_and_upload_to_s3(job_id, clique_weights_raw):
+
+    community, persons, clique_names, table_size = json.loads(
+        s3.get_object(
+            Bucket='dining-tables-chart',
+            Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
+
+    # convert keys of clique_weights to use the clique numbers instead
+    clique_weights = {str(clique_names.index(key) + 1): values
+                      for key, values in clique_weights_raw.items()}
+
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        persons, presolved)
+        persons, presolved, clique_weights)
 
     facts = add_solving_atoms(facts)
     s3.put_object(Bucket='dining-tables-chart',
@@ -221,12 +246,12 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
     return tables
 
 
-def partition(community, job_id, persons, table_size):
+def partition(community, job_id, persons, table_size, clique_weights):
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        persons, presolved)
+        persons, presolved, clique_weights)
 
     resp_text = solve_by_clingo(facts, job_id)
 

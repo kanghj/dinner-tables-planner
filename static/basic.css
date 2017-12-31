@@ -1,0 +1,36 @@
+.community-tag {
+    display:none;
+}
+.community-tag.show {
+    display:block;
+}
+
+.controls {
+    display:flex;
+    justify-content: space-between;
+
+}
+
+.controls > article {
+    margin-left: auto;
+    margin-right:auto;
+    margin-top: 72px;
+    padding:8px;
+    margin-bottom: 36px;
+}
+
+.controls label {
+    display:flex;
+    flex-direction:column;
+}
+.controls input {
+    margin-left: auto;
+    margin-right:auto;
+}
+.red {
+    background: red;
+}
+
+.hide {
+    display:none;
+}

@@ -24,6 +24,8 @@ class CoarserTest(TestCase):
 
         self.assertTrue(8 in coarse_to_original.keys())
 
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
+
 
     def test_coarse_local_simple(self):
         community = {
@@ -38,6 +40,7 @@ class CoarserTest(TestCase):
         self.assertTrue(0 in coarse_to_original.keys())
 
         self.assertTrue(9 in coarse_to_original.keys())
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
 
 
     def test_coarse_local_does_not_remove_multiple_connected_person(self):
@@ -58,6 +61,8 @@ class CoarserTest(TestCase):
         self.assertTrue(9 in coarse_to_original.keys())
         self.assertEqual(coarse_to_original[2], [2])
 
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
+
     def test_coarse_local_handles_single_person_in_node(self):
         community = {
             0: [0, 1, 2, 3]
@@ -69,6 +74,8 @@ class CoarserTest(TestCase):
         self.assertTrue(0 in coarse_to_original.keys())
         self.assertTrue(3 in coarse_to_original.keys())
         self.assertEqual(coarse_to_original[3], [3])
+
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
 
     def test_coarse_local_handles_nodes_connected_to_persons(self):
         community = {
@@ -90,6 +97,8 @@ class CoarserTest(TestCase):
         self.assertTrue(0 in coarse_to_original.keys())
         self.assertTrue(7 in coarse_to_original.keys())
         self.assertEqual(coarse_to_original[3], [3])
+
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
 
     def test_coarse_local_handles_repeated_occurence_but_not_always(self):
         community = {
@@ -115,6 +124,8 @@ class CoarserTest(TestCase):
         self.assertEquals([7, 8], coarse_to_original[7])
         self.assertEqual(coarse_to_original[3], [3])
 
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
+
         # self.assertTrue(('in_table', 3, 0) in presolved_facts)
         # TODO is this wrong?
         # self.assertTrue(('in_table', 6, 0) in presolved_facts)
@@ -134,3 +145,5 @@ class CoarserTest(TestCase):
 
         self.assertEquals([0, 1], coarse_to_original[0])
         self.assertEquals([2, 3], coarse_to_original[2])
+
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')

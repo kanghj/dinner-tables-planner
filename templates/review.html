@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tables</title>
+    <link rel="stylesheet" type="text/css" href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+<body>
+
+    <article>
+        <h1>Review information</h1>
+
+        <p>Please review some information by answering a few simple questions. These questions are optional.</p>
+
+        <div class="hide">
+            <h3>Are these person names typos?</h3>
+            <p>TODO</p>
+        </div>
+
+        <form action="solve" method="POST">
+            <input type="hidden" name="job_id" value="{{job_id}}">
+
+            <h3>How important is it that these members of these groups stay together?</h3>
+            <fieldset>
+                <input type="hidden" name="num_cliques" value="{{clique_names|length}}">
+                {% for clique_name in clique_names %}
+                    <label>{{clique_name}}</label>
+                    <input name="{{loop.index}}_weight" type="number" value="1">
+                    <input class="hide" type="checkbox" name="{{loop.index}}_clique_name" value="{{clique_name}}" checked>
+                {% endfor %}
+                <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+                <input type="submit" name="submit" value="Finalise">
+            </fieldset>
+
+        </form>
+    </article>
+
+</body>
+</html>

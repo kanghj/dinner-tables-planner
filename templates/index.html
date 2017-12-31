@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <title>Dining Table Seating Planner</title>
     <link rel="stylesheet"
-    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
 </head>
 <body>
-    <h1>Dining Table Seat Planner</h1>
-
     {% if result.deleted_msg %}
         <p>The seating plan has been deleted.</p>
     {% endif %}
+    <h1>Dining Table Seat Planner</h1>
 
     <article>
         <h2>Submit Guest List</h2>
-        <form method="post" enctype="multipart/form-data" action="solve">
+        <form method="post" enctype="multipart/form-data" action="review">
             <fieldset>
                 <label for="file">Guest List (.csv or .xlsx)</label>
                 <input type="file" name="file">
@@ -26,29 +26,27 @@
                 <input type="submit" value="Upload">
             </fieldset>
         </form>
-    </article>
-    <div>
-        <h2>Instructions</h2>
-        <p>
-            Each column consists of a header and subsequent rows are names of people who know each other.
-        </p>
-        <p>
-            A single person is allowed to appear in multiple columns.
-            E.g. "Hercule Poirot" is a classmate to both the groom and the bride.
-        </p>
-        <img src="static/example.PNG">
-    </div>
-    <article>
+
+        <div>
+            <h2>Instructions</h2>
+            <p>
+                Each column consists of a header and subsequent rows are names of people who know each other.
+            </p>
+            <p>
+                A single person is allowed to appear in multiple columns.
+                E.g. "Hercule Poirot" is a classmate to both the groom and the bride.
+            </p>
+            <img src="static/example.PNG">
+        </div>
+
         <h2>Retrieve Results</h2>
         <p>
-        Already have a token to retrieve a seating plan with?
-
-
+        Already submitted and have a token to retrieve a seating plan with?
         </p>
         <form method="get" enctype="multipart/form-data" action="retrieve">
             <fieldset>
                 <label for="job_id">Token</label>
-              <input type="text" name="job_id">
+              <input type="text" name="job_id" id="job_id">
 
              <input type="submit" value="Retrieve">
             </fieldset>

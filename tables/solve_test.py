@@ -243,7 +243,7 @@ class SolverTest(TestCase):
         }
         persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
         assert len(persons) == 11
-        tables, persons = partition(community, str(uuid.uuid4()), persons, 3)
+        tables, persons = partition(community, str(uuid.uuid4()), persons, 3, {0: 1, 1: 1, 2:1})
 
         resulting_groups = [values for values in tables.values()]
         print(resulting_groups)
@@ -262,7 +262,7 @@ class SolverTest(TestCase):
         }
         persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
         assert len(persons) == 11
-        tables, persons = partition(community, str(uuid.uuid4()), persons, 3)
+        tables, persons = partition(community, str(uuid.uuid4()), persons, 3, {0: 1, 1: 1, 2:1})
 
         resulting_groups = [sorted(values) for values in tables.values()]
         print(resulting_groups)
@@ -273,24 +273,3 @@ class SolverTest(TestCase):
         self.assertTrue([4, 6] in resulting_groups)
         self.assertTrue([7, 8, 9] in resulting_groups)
 
-    @pytest.mark.skip(reason="too slow")
-    def test_partition_large(self):
-
-        assert len(self.persons) == 200
-        tables, persons = partition(self.large_community,
-                                    str(uuid.uuid4()), self.persons, 3)
-
-        resulting_groups = [values for values in tables.values()]
-        self.assertNotEqual(resulting_groups, [])
-        ## this test is successful as long as something is returned
-
-    @pytest.mark.skip(reason="too slow")
-    def test_partition_large_large_clique(self):
-
-        assert len(self.persons) == 200
-        tables, persons = partition(self.large_community,
-                                    str(uuid.uuid4()), self.persons, 10)
-
-        resulting_groups = [values for values in tables.values()]
-        self.assertNotEqual(resulting_groups, [])
-        ## this test is successful as long as something is returned

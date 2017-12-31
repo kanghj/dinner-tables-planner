@@ -1,11 +1,13 @@
-import sys
 import uuid
+import sys
 
 import os
+
+import datetime
 from flask import Flask, request, redirect, render_template, send_file, session
 from werkzeug.exceptions import abort
 
-from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job
+from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job, create_staging_file_and_upload_to_s3
 from excel_converter import make_workbook
 import random
 from collections import defaultdict
@@ -28,8 +30,12 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/solve', methods=['POST'])
-def solve():
+@app.route('/review', methods=['POST'])
+def review():
+    """
+    Endpoint to review the guest list, and to assign weights.
+    Should also allow user to confirm if the number of distinct guests for each name
+    """
     if 'file' not in request.files:
         return redirect(request.url)
 
@@ -46,7 +52,29 @@ def solve():
     if not file or not allowed_file(file.filename):
         return redirect(request.url)
 
-    job_id = create_file_and_upload_to_s3(table_size, file)
+    job_id, community, persons, clique_names = create_staging_file_and_upload_to_s3(table_size, file)
+
+    return render_template('review.html', job_id=job_id,
+                           clique_names=[clique_name
+                                         for clique_name in clique_names])
+
+
+@app.route('/solve', methods=['POST'])
+def solve():
+
+    job_id = request.form['job_id']
+
+    if job_id == '':
+        return redirect('/')
+
+    num_cliques = request.form['num_cliques']
+    clique_weights = {}
+    for i in range(1, int(num_cliques) + 1):
+        name = request.form[str(i) + '_clique_name']
+        weight = request.form[str(i) + '_weight']
+        clique_weights[name] = weight
+
+    create_file_and_upload_to_s3(job_id, clique_weights)
     page_html = """
     <!doctype html>
     <html>
@@ -57,11 +85,11 @@ def solve():
     </head>
     <body>
         <p>
-        Your token is {}. Please copy and paste it somewhere.
+        Your token is <strong>{}</strong>. Please copy and paste it somewhere for future reference.
         </p>
         <p>
         Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after {}
-        minutes and collect our proposed seating plan to your event.
+        minutes to collect our proposed seating plan to your event.
         </p>
     </body>
     """
@@ -95,7 +123,7 @@ def retrieve():
                 <p>{}</p>
                 <p>
                 If you are unable to access this page even
-                after waiting for 6 hours,
+                after waiting for about 6 hours,
                 let us know!</p>
             </body>
             </html>
@@ -108,12 +136,10 @@ def retrieve():
     table_html = convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names)
 
     return render_template('retrieve.html',
-                           result = {
+                           result={
                             'table' : table_html,
                             'job_id' : job_id
-                           }
-    )
-
+                           })
 
 
 def convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names):
@@ -176,10 +202,10 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
     return html + body_html + "</table>"
 
 
-@app.route('/retrieve_as_xlsx', methods=['GET'])
+@app.route('/retrieve_as_xlsx', methods=['POST'])
 def retrieve_as_excel():
-    job_id = request.args.get('job_id')
-    tables, persons, coarse_to_original, new_community = ans_from_s3_ans_bucket(job_id)
+    job_id = request.form['job_id']
+    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
     bytes_xlsx = make_workbook(persons, tables)
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",
@@ -198,6 +224,7 @@ def csrf_protect():
     if request.method == "POST":
         token = session.pop('_csrf_token', None)
         if not token or token != request.form.get('_csrf_token'):
+            print('csrf token missing or invalid', file=sys.stderr)
             abort(403)
 
 
@@ -207,3 +234,9 @@ def generate_csrf_token():
     return session['_csrf_token']
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+
+@app.context_processor
+def inject_now():
+    now = datetime.datetime.utcnow()
+    return {'yearmonth': now.strftime("%Y%W")}
