@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tables</title>
+    <title>Dining Table Seating Planner - Seating Plan</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
     <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
@@ -27,7 +27,7 @@
 
         <p>This proposed seating plan will be available here forever.</p>
         <p>You can download this seating plan (viewable with Excel).</p>
-        <form method="POST" action="retrieve_as_xlsx">
+        <form class="download" method="POST" action="retrieve_as_xlsx">
             <input type="hidden" name="job_id" value="{{ result.job_id }}">
             <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
             <input type="submit" value="Download"></form>
@@ -44,9 +44,11 @@
     </article>
 
    <script>
+    window.addEventListener('DOMContentLoaded', function() {
         $('#see-original-clique-names').click(function(event) {
             $('.community-tag').toggleClass('show');
         });
+    });
 
     </script>
 </body>

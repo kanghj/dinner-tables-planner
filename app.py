@@ -16,7 +16,7 @@ app.secret_key = os.environ['FLASK_SECRET']
 
 ALLOWED_EXTENSIONS = set(['csv', 'xlsx'])
 
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 megabytes
+app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1 megabyte
 
 
 @app.route('/')
@@ -79,7 +79,7 @@ def solve():
     <!doctype html>
     <html>
     <head>
-        <title>Tables</title>
+        <title>Dining Table Seating Planner - Token and Further Instructions</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
@@ -111,7 +111,7 @@ def retrieve():
             <!doctype html>
             <html>
             <head>
-                <title>Not ready yet</title>
+                <title>Dining Table Seating Planner - Not Ready Yet</title>
                 <link rel="stylesheet"
             href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
             </head>
@@ -161,7 +161,6 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
     for community_key in new_community.keys():        
         colour = '#%02X%02X%02X' % (r(),r(),r())
         colours[community_key] = colour
-
 
     html = "<table>"
     headers = [str(i) for i in range(1, num_tables + 1)]
@@ -218,6 +217,7 @@ def delete():
     delete_job(job_id)
 
     return redirect('/?message=deleted')
+
 
 @app.before_request
 def csrf_protect():

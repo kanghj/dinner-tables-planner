@@ -27,10 +27,21 @@
     margin-left: auto;
     margin-right:auto;
 }
-.red {
+.red,input[type="submit"].red {
     background: red;
 }
 
 .hide {
     display:none;
+}
+
+.center {
+    text-align: center;
+    height: 64px;
+    position: relative;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
