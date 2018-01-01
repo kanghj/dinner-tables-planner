@@ -102,7 +102,7 @@ def solve():
 
 @app.route('/retrieve', methods=['GET'])
 def retrieve():
-    job_id = request.args.get('job_id')
+    job_id = request.args.get('job_id').strip()
     tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
     if tables is None:
         from_submit_page = request.args.get('from_submit_page')
