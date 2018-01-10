@@ -11,7 +11,7 @@
 </head>
 <body>
     {% if result.deleted_msg %}
-        <p class="center">The seating plan has been deleted. If you wish to access it again, you will need to re-submit the guest list to recreate the plan.</p>
+        <p class="center">You have deleted the seating plan. You will need to re-submit the guest list to recreate the plan if you need to reference it again.</p>
     {% endif %}
     <h1>Dining Tables Seat Planner</h1>
     <article>
@@ -20,7 +20,7 @@
             <small>Having trouble figuring out where to fit all your guests? </small>
         </span>
         <span>
-            <small>Let our app help you minimize the awkwardness at your dining event today!</small>
+            <small>Submit a spreadsheet with your guests and we'll handle the table allocation.</small>
         </span>
         <form method="post" enctype="multipart/form-data" action="review">
             <fieldset>
@@ -36,8 +36,8 @@
         <div>
             <h2>Need Instructions?</h2>
             <p>
-                Upload an Excel file listing each group/community of friends.
-                The header of each column is the name of the community, and subsequent rows are names of people in that group.
+                Upload an Excel file listing each group/community of guests.
+                Write the name of the community as the header of each column. Then add names of guests in that community as rows.
             </p>
             <p>
                 A single person is allowed to appear in multiple columns.
@@ -47,9 +47,9 @@
         </div>
 
         <h2>Retrieve Results</h2>
-        <p>
+        <small>
         Already submitted and have a token to retrieve a seating plan with?
-        </p>
+        </small>
         <form method="get" enctype="multipart/form-data" action="retrieve">
             <fieldset>
                 <label for="job_id">Token</label>
