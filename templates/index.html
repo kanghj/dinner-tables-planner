@@ -8,6 +8,7 @@
     <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
     <script defer src="static/common.js?date={{yearmonth}}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
     <section>
@@ -48,10 +49,19 @@
                 <img src="static/example.PNG">
             </div>
 
+            <div>
+                <h2>Creating the Guest List</h2>
+
+                <div>You may download a template guest list <a href="static/example.xlsx">here</a>.</div>
+                <div>Alternatively, we can <a href="/login">initialise a guest list</a> based on your Facebook photos after you login.</div>
+
+            </div>
+
             <h2>Retrieve Results</h2>
             <small>
             Already submitted and have a token to retrieve a seating plan with?
             </small>
+            <p></p>
             <form method="get" enctype="multipart/form-data" action="retrieve">
                 <fieldset>
                     <label for="job_id">Token</label>

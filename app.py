@@ -84,6 +84,7 @@ def solve():
         <title>Dining Tables Seating Chart Plan - Token and Further Instructions</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
         <p>
@@ -116,6 +117,7 @@ def retrieve():
                 <title>Dining Tables Seating Chart Plan - Not Ready Yet</title>
                 <link rel="stylesheet"
             href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+            <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
             </head>
             <body>
                 <h1>Oops, we need more time</h1>
