@@ -81,7 +81,7 @@ def solve():
     <!doctype html>
     <html>
     <head>
-        <title>Dining Tables Seat Planner - Token and Further Instructions</title>
+        <title>Dining Tables Seating Chart Plan - Token and Further Instructions</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     </head>
@@ -113,7 +113,7 @@ def retrieve():
             <!doctype html>
             <html>
             <head>
-                <title>Dining Tables Seat Planner - Not Ready Yet</title>
+                <title>Dining Tables Seating Chart Plan - Not Ready Yet</title>
                 <link rel="stylesheet"
             href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
             </head>
