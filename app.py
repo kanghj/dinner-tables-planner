@@ -1,10 +1,11 @@
+import json
 import uuid
 import sys
 
 import os
 
 import datetime
-from flask import Flask, request, redirect, render_template, send_file, session
+from flask import Flask, request, redirect, render_template, send_file, session, send_from_directory
 from werkzeug.exceptions import abort
 
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job, create_staging_file_and_upload_to_s3
@@ -94,7 +95,7 @@ def solve():
     </body>
     """
     return app.response_class(
-        response=page_html.format(job_id, job_id, '15'),
+        response=page_html.format(job_id, job_id, '30'),
         status=200,
         mimetype='text/html'
     )
@@ -219,6 +220,26 @@ def delete():
     return redirect('/?message=deleted')
 
 
+@app.route('/login')
+def login():
+    fb_app_id = os.environ['FB_APP_ID']
+    return render_template('login.html', fb_app_id=fb_app_id)
+
+
+@app.route('/template_spreadsheet', methods=['POST'])
+def template_spreadsheet():
+    communities = json.loads(request.form['communities'])
+    persons = json.loads(request.form['persons'])
+
+    bytes_xlsx = make_workbook(persons, communities)
+    return send_file(bytes_xlsx, attachment_filename="guest_list.xlsx",
+                     as_attachment=True)
+
+@app.route('/privacy', methods=['GET'])
+def privacy():
+    return send_from_directory('static', 'privacy.html')
+
+
 @app.before_request
 def csrf_protect():
     if request.method == "POST":
@@ -237,6 +258,6 @@ app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
 
 @app.context_processor
-def inject_now():
+def inject_yearmonth():
     now = datetime.datetime.utcnow()
     return {'yearmonth': now.strftime("%Y%W")}
