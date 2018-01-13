@@ -2,63 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dining Tables Seat Planner</title>
+    <title>Dining Tables Seating Chart Plan</title>
     <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
     <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
-    <script defer src="static/common.js"></script>
+    <script defer src="static/common.js?date={{yearmonth}}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-    {% if result.deleted_msg %}
-        <p class="center">You have deleted the seating plan. You will need to re-submit the guest list to recreate the plan if you need to reference it again.</p>
-    {% endif %}
-    <h1>Dining Tables Seat Planner</h1>
-    <article>
-        <h2>Submit Guest List</h2>
-        <span style="display:block;">
-            <small>Having trouble figuring out where to fit all your guests? </small>
-        </span>
-        <span>
-            <small>Submit a spreadsheet with your guests and we'll handle the table allocation.</small>
-        </span>
-        <form method="post" enctype="multipart/form-data" action="review">
-            <fieldset>
-                <label for="file-upload">Guest List (.csv or .xlsx)</label>
-                <input id="file-upload" type="file" name="file">
-                <label for="table-size">Seats per table</label>
-                <input id="table-size" type="number" name="size"
-                        placeholder="10">
-                <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
-                <input type="submit" value="Upload">
-            </fieldset>
-        </form>
-        <div>
-            <h2>Need Instructions?</h2>
-            <p>
-                Upload an Excel file listing each group/community of guests.
-                Write the name of the community as the header of each column. Then add names of guests in that community as rows.
-            </p>
-            <p>
-                A single person is allowed to appear in multiple columns.
-                E.g. In this wedding, "Hercule Poirot" is a classmate to both the groom and the bride, and appears in both columns.
-            </p>
-            <img src="static/example.PNG">
-        </div>
+    <section>
+        {% if result.deleted_msg %}
+            <p class="center">You have deleted the seating plan. You will need to re-submit the guest list to recreate the plan if you need to reference it again.</p>
+        {% endif %}
+        <h1>Dining Tables Seating Chart Plan</h1>
 
-        <h2>Retrieve Results</h2>
-        <small>
-        Already submitted and have a token to retrieve a seating plan with?
-        </small>
-        <form method="get" enctype="multipart/form-data" action="retrieve">
-            <fieldset>
-                <label for="job_id">Token</label>
-              <input type="text" name="job_id" id="job_id">
+        <article>
+            <h2>Submit Guest List</h2>
+            <span style="display:block;">
+                <small>Having trouble figuring out where to fit all your guests? </small>
+            </span>
+            <span>
+                <small>Submit a spreadsheet with your guests and we'll handle the table allocation.</small>
+            </span>
+            <form method="post" enctype="multipart/form-data" action="review">
+                <fieldset>
+                    <label for="file-upload">Guest List (.csv or .xlsx)</label>
+                    <input id="file-upload" type="file" name="file">
+                    <label for="table-size">Seats per table</label>
+                    <input id="table-size" type="number" name="size"
+                            placeholder="10">
+                    <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+                    <input type="submit" value="Upload">
+                </fieldset>
+            </form>
+            <div>
+                <h2>Need Instructions?</h2>
+                <p>
+                    Upload an Excel file listing each group/community of guests.
+                    Write the name of the community as the header of each column. Then add names of guests in that community under that column.
+                </p>
+                <p>
+                    A single person is allowed to appear in multiple columns.
+                    E.g. In this wedding, "Hercule Poirot" is a classmate to both the groom and the bride, and appears in both columns.
+                </p>
+                <img src="static/example.PNG">
+            </div>
 
-             <input type="submit" value="Retrieve">
-            </fieldset>
-        </form>
-    </article>
+            <div>
+                <h2>Creating the Guest List</h2>
+
+                <div>You may download a template guest list <a href="static/example.xlsx">here</a>.</div>
+                <div>Alternatively, we can <a href="/login">initialise a guest list</a> based on your Facebook photos after you login.</div>
+
+            </div>
+
+            <h2>Retrieve Results</h2>
+            <small>
+            Already submitted and have a token to retrieve a seating plan with?
+            </small>
+            <p></p>
+            <form method="get" enctype="multipart/form-data" action="retrieve">
+                <fieldset>
+                    <label for="job_id">Token</label>
+                  <input type="text" name="job_id" id="job_id">
+
+                 <input type="submit" value="Retrieve">
+                </fieldset>
+            </form>
+        </article>
+    </section>
+
+    <footer>
+        <nav>
+            <ul>
+                <li>
+                    <small>
+                        <a href="/privacy">Privacy</a>
+                    </small>
+                </li>
+            </ul>
+        </nav>
+
+    </footer>
+
 
 </body>
 </html>

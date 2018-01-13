@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dining Tables Seat Planner - Seating Plan</title>
+    <title>Dining Tables Seating Chart Plan - Seating Plan</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
     <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
-    <script defer src="static/common.js"></script>
+    <script defer src="static/common.js?date={{yearmonth}}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
 
 </head>
@@ -43,6 +44,19 @@
         </form>
     </article>
 
+    <footer>
+        <nav>
+            <ul>
+                <li>
+                    <small>
+                        <a href="/privacy">Privacy</a>
+                    </small>
+                </li>
+            </ul>
+        </nav>
+
+    </footer>
+
    <script>
     window.addEventListener('DOMContentLoaded', function() {
         $('#see-original-clique-names').click(function(event) {
@@ -51,5 +65,7 @@
     });
 
     </script>
+
+
 </body>
 </html>

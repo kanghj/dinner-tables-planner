@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dining Tables Seating Chart Plan - Template Spreadsheet</title>
+    <link defer rel="stylesheet"
+    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
+    <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
+<body>
+<script>
+  window.fbAsyncInit = function() {
+  FB.init({
+      appId            : '{{fb_app_id}}',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.11'
+    });
+  };
+
+  (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  function myFacebookLogin() {
+      FB.getLoginStatus(function(response){
+        statusChangeCallback(response);
+      }, {scope: 'user_photos'});
+  }
+
+</script>
+<script src="static/fb_callback.js"></script>
+<section>
+    <h1>Dining Table Seat Planner</h1>
+    <article>
+    <h2>Create Template Spreadsheet</h2>
+        <div id="fb-root"></div>
+        <div onlogin="myFacebookLogin()" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="login_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+        <div id="status"></div>
+        <p>
+        <div>
+            <span>From your publicly available Facebook photos, we'll construct a template spreadsheet that you can further edit.</span>
+            <span>To do, we'll retrieve the list of people tagged in recent Facebook photos.</span>
+        </div>
+        <div>
+            <span>We will not retain any information on our servers and this information will not be used for any other purpose.</span>
+        </div>
+        </p>
+
+        <p>
+        Once you login, it will trigger a download of an Excel file where you can continue editing and adding more names.
+        Once ready, <a href="/">return to the home page</a> and upload the guest list.
+        </p>
+
+
+    <form method="POST" action="template_spreadsheet" style="display:none;">
+        <input name="communities">
+        <input name="persons">
+        <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+    </form>
+    </article>
+</section>
+
+<footer>
+    <nav>
+        <ul>
+            <li>
+                <small>
+                    <a href="/privacy">Privacy</a>
+                </small>
+            </li>
+        </ul>
+    </nav>
+
+</footer>
+
+</body>
+</html>
