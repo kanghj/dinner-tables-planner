@@ -8,6 +8,7 @@ import datetime
 from flask import Flask, request, redirect, render_template, send_file, session, send_from_directory
 from werkzeug.exceptions import abort
 
+from communities import merge_similar
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job, create_staging_file_and_upload_to_s3
 from excel_converter import make_workbook
 import random
@@ -228,8 +229,13 @@ def login():
 
 @app.route('/template_spreadsheet', methods=['POST'])
 def template_spreadsheet():
-    communities = json.loads(request.form['communities'])
+    communities_json = json.loads(request.form['communities'])
     persons = json.loads(request.form['persons'])
+
+    # merge similar communities
+    communities = {key : set(members) for key, members in communities_json.items()}
+
+    communities = merge_similar(communities)
 
     bytes_xlsx = make_workbook(persons, communities)
     return send_file(bytes_xlsx, attachment_filename="guest_list.xlsx",

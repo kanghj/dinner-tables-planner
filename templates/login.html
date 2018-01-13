@@ -69,25 +69,28 @@
         var now = new Date();
 
         var i = 0;
+        var retrievedPhotosPromises = [];
         for (photo of photos) {
             function fetchTagsForSinglePhoto(photo) {
-                FB.api(photo.id + '/tags', function(response) {
-                    communities[photo.id] = [];
-                    for (var data of response['data']) {
-                        var name = data['name'];
-                        if (data['name'] in person_ids && person_ids[data['name']] !== data['id']) {
-                            name = data['name'] + '_' + data['id'];
+                return new Promise(function(resolve, reject) {
+
+
+                    FB.api(photo.id + '/tags', function(response) {
+                        communities[photo.id] = [];
+                        for (var data of response['data']) {
+                            var name = data['name'];
+                            if (data['name'] in person_ids && person_ids[data['name']] !== data['id']) {
+                                name = data['name'] + '_' + data['id'];
+                            }
+                            person_ids[name] = data['id'];
+                            persons.push(name);
+                            communities[photo.id].push(persons.indexOf(name));
+
                         }
-                        person_ids[name] = data['id'];
-                        persons.push(name);
-                        communities[photo.id].push(persons.indexOf(name));
 
-                    }
+                        resolve();
 
-                    // refactor... promises
-                    if (Object.keys(communities).length === photos.length) {
-                        requestSpreadsheet();
-                    }
+                    });
 
                 });
             }
@@ -96,11 +99,15 @@
 
             var timeDiff = Math.abs(now.getTime() - photoDate.getTime());
             var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-            if (diffDays < (364 * 3) && i < 50) {
-                fetchTagsForSinglePhoto(photo);
+            if (diffDays < (364 * 3) && i < 150) {
+                retrievedPhotosPromises.push(fetchTagsForSinglePhoto(photo));
             }
             i += 1;
         }
+
+        Promise
+            .all(retrievedPhotosPromises)
+            .then(requestSpreadsheet);
     }
 
     function requestSpreadsheet() {
@@ -121,14 +128,14 @@
 <section>
     <h1>Dining Table Seat Planner</h1>
     <article>
-    <h2>Template Spreadsheet based on Facebook Profile</h2>
+    <h2>Create Template Spreadsheet</h2>
         <div id="fb-root"></div>
         <div onlogin="myFacebookLogin()" class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="login_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
         <div id="status"></div>
         <p>
         <div>
-            <span>From your Facebook information, we'll construct a template spreadsheet for further editing.</span>
-            <span>To do, we'll retrieve a list people tagged in recent public Facebook photos.</span>
+            <span>From your Facebook information, we'll construct a template spreadsheet that you can further edit.</span>
+            <span>To do, we'll retrieve a list of people tagged in recent Facebook photos.</span>
         </div>
         <div>
             <span>We will not retain any information on our servers and this information will not be used for any other purpose.</span>
