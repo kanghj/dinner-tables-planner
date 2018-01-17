@@ -14,9 +14,10 @@
 </head>
 <body>
     <div>
-        <h1>Seating Plan</h1>
+        <h1>Dining Tables Seating Chart Plan</h1>
     </div>
     <article>
+        <h2>Seating Chart</h2>
         <label class="right">
             <input type="checkbox" name="see-original-clique-names" id="see-original-clique-names">
             Label each person with original groups
@@ -26,7 +27,7 @@
 
     <article class="below-results">
 
-        <p>This proposed seating plan will be available here forever.</p>
+        <p>This proposed seating plan will be available at this url for about 2 weeks.</p>
         <p>You can download this seating plan (viewable with Excel).</p>
         <form class="download" method="POST" action="retrieve_as_xlsx">
             <input type="hidden" name="job_id" value="{{ result.job_id }}">
@@ -35,7 +36,7 @@
         </form>
 
         <form class="delete-form" action="delete" method="POST">
-            <small>Once done with your event, please help us save storage cost by deleting this seating plan.</small>
+            <small>You can delete this seating plan early if you wish.</small>
             <fieldset>
                 <input type="hidden" name="job_id" value="{{ result.job_id }}" />
                 <input name=_csrf_token type=hidden value="{{ csrf_token() }}">

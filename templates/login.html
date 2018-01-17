@@ -31,7 +31,7 @@
 
   function myFacebookLogin() {
       FB.getLoginStatus(function(response){
-        statusChangeCallback(response);
+        getPhotos(response);
       }, {scope: 'user_photos'});
   }
 
@@ -59,12 +59,16 @@
         Once ready, <a href="/">return to the home page</a> and upload the guest list.
         </p>
 
+        <div class="logout hide">
 
-    <form method="POST" action="template_spreadsheet" style="display:none;">
-        <input name="communities">
-        <input name="persons">
-        <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
-    </form>
+        </div>
+
+
+        <form method="POST" action="template_spreadsheet" style="display:none;">
+            <input name="communities">
+            <input name="persons">
+            <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+        </form>
     </article>
 </section>
 

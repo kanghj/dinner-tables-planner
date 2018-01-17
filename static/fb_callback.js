@@ -1,9 +1,32 @@
-function statusChangeCallback(response) {
+function getPhotos(response) {
     if (response.status === 'connected') {
-      FB.api('/me', function(response) {
-        userId = response['id'];
+      new Promise(function(resolve, reject) {
+          FB.api('/me', function(response) {
+            var userId = response['id'];
+            resolve(userId);
+          });
+      })
+      .then(function(userId) {
+        return new Promise(function(resolve, reject) {
+            FB.api('/me/permissions/', function(response) {
+                var declined = [];
+                for (i = 0; i < response.data.length; i++) {
+                    if (response.data[i].status == 'declined') {
+                      declined.push(response.data[i].permission)
+                    }
+                }
+                if (declined.length === 0)
+                    resolve();
+                else
+                    reject();
+            });
+        });
+      }).then(function() {
+        fetchPhotos('/me/photos');
+      }).catch(function(reason) {
+
       });
-      fetchPhotos('/me/photos');
+
     } else {
       // not logged in
       document.getElementById('status').innerHTML = 'Please login to Facebook to use this feature. If you do not wish to initialise a template using your Facebook information, please directly download our template from the home page';
