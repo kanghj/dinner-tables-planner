@@ -111,14 +111,17 @@ def solve():
     <!doctype html>
     <html>
     <head>
-        <title>Dining Tables Seating Chart Plan - Token and Further Instructions</title>
+        <title>Seating Chart Plan - Token and Further Instructions</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
     <link rel="shortcut icon" href="static/favicon.ico">
     </head>
     <body>
         <p>
-        Your token is <strong>{}</strong>. Please copy and paste it somewhere for future reference.
+        Your token is <strong>{}</strong>. If you were not logged-in to Facebook when submitting the guest list, please copy and paste it somewhere for future reference.
+        </p>
+        <p>
+        We will need some time to process your guest list and plan a sitting arrangement.
         </p>
         <p>
         Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after {}
@@ -144,7 +147,7 @@ def retrieve():
             <!doctype html>
             <html>
             <head>
-                <title>Dining Tables Seating Chart Plan - Not Ready Yet</title>
+                <title>Seating Chart Plan - Not Ready Yet</title>
                 <link rel="stylesheet"
             href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
             <link rel="shortcut icon" href="static/favicon.ico">
