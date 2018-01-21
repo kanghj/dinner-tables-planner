@@ -13,7 +13,7 @@ from accounts.users import UserJobs
 from communities import merge_similar
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job, create_staging_file_and_upload_to_s3
 from excel_converter import make_workbook
-from accounts import db
+from accounts import db, users
 import random
 from collections import defaultdict
 
@@ -43,7 +43,9 @@ def allowed_file(filename):
 @app.route('/submissions_for_user', methods=['GET'])
 def get_submissions():
     access_token = request.args.get('access_token')
-
+    user_id = verify_facebook_access_token_and_get_user_id(access_token)
+    jobs = users.jobs_of_user(user_id)
+    return render_template('binder.html', jobs = jobs)
 
 
 @app.route('/review', methods=['POST'])
@@ -97,7 +99,7 @@ def solve():
     user_facebook_access_token = request.form['facebook_access_token']
 
     if user_facebook_access_token is not None and len(user_facebook_access_token) > 0:
-        user_id = verify_facebook_access_token_and_get_user_id
+        user_id = verify_facebook_access_token_and_get_user_id()
         db.db_session.add(UserJobs(id=user_id, job_id=job_id))
         db.db_session.commit()
 
@@ -108,7 +110,7 @@ def solve():
         <title>Dining Tables Seating Chart Plan - Token and Further Instructions</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="static/favicon.ico">
     </head>
     <body>
         <p>
@@ -247,9 +249,9 @@ def delete():
     return redirect('/?message=deleted')
 
 
-@app.route('/login')
+@app.route('/from_photos')
 def login():
-    return render_template('login.html', fb_app_id=fb_app_id)
+    return render_template('from_photos.html', fb_app_id=fb_app_id)
 
 
 @app.route('/template_spreadsheet', methods=['POST'])
@@ -266,21 +268,26 @@ def template_spreadsheet():
     return send_file(bytes_xlsx, attachment_filename="guest_list.xlsx",
                      as_attachment=True)
 
+
 @app.route('/privacy', methods=['GET'])
 def privacy():
     return send_from_directory('static', 'privacy.html')
 
 
-def verify_facebook_access_token_and_get_user_id():
-    if request.form['facebook_access_token']:
+def verify_facebook_access_token_and_get_user_id(access_token = None):
+    if access_token is None and request.form['facebook_access_token']:
         fb_access_token = request.form['facebook_access_token']
-        graph = facebook.GraphAPI(access_token=fb_access_token, version="2.11")
-        debug_data = graph.debug_access_token(fb_access_token, fb_app_id, fb_app_secret)
-        return debug_data['data']['user_id']
-    return None
+    else:
+        fb_access_token = access_token
+    graph = facebook.GraphAPI(access_token=fb_access_token, version="2.7")
+    debug_data = graph.debug_access_token(fb_access_token, fb_app_id, fb_app_secret)
+    return debug_data['data']['user_id']
+
+
 
 def get_facebook_app_access_token():
     return facebook.get_app_access_token(fb_app_id, fb_app_secret)
+
 
 @app.before_request
 def csrf_protect():
@@ -290,11 +297,16 @@ def csrf_protect():
             print('csrf token missing or invalid', file=sys.stderr)
             abort(403)
 
+@app.before_request
+def before_request():
+    if not request.url.startswith('https'):
+        return redirect(request.url.replace('http', 'https', 1))
 
 def generate_csrf_token():
     if '_csrf_token' not in session:
         session['_csrf_token'] = str(uuid.uuid4())
     return session['_csrf_token']
+
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
@@ -304,12 +316,11 @@ def inject_yearmonth():
     now = datetime.datetime.utcnow()
     return {'yearmonth': now.strftime("%Y%W")}
 
-###
-# Remove database conection.
-###
-
 @app.teardown_request
 def shutdown_session(exception=None):
+    """
+    Remove database connection
+    """
 
     db.db_session.remove()
 

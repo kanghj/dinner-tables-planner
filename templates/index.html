@@ -6,19 +6,22 @@
     <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
     <link defer rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script defer src="static/common.js?date={{yearmonth}}"></script>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
+    <script src="static/home.js"></script>
     <script>
       window.fbAsyncInit = function() {
-      FB.init({
+        FB.init({
           appId            : '{{fb_app_id}}',
           autoLogAppEvents : true,
           xfbml            : true,
           version          : 'v2.11'
         });
+
+        myFacebookLogin(function() {});
       };
 
       (function(d, s, id){
@@ -29,26 +32,48 @@
           fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
 
-      function myFacebookLogin() {
+      // TODO check once page is ready
+      function myFacebookLogin(errCallback) {
           FB.getLoginStatus(function(response){
-            statusChangeCallback(response);
+          // TODO check if login already
+            if (response.status === 'connected') {
+                statusChangeCallback(response);
+            } else {
+                if (errCallback) {
+                    errCallback();
+                } else {
+                    $('.fb-login-message').removeClass('hide');
+                }
+            }
           }, {scope: 'user_photos'});
       }
 
-      function statusChangeCallback(response) {
-          $('facebook_access_token').val(response.authResponse.accessToken);
-      }
-
-      function fetchExistingJobs(access_token) {
-
+      function logoutFacebook(event) {
+        FB.logout(function(response) {
+          deleteFbCookie("fblo_" + {{fb_app_id}});
+          window.location.reload();
+        });
       }
 
     </script>
+    <div id="fb-root"></div>
     <header>
         <section>
         <nav>
             <ul>
-                <li>Login</li>
+                <li>
+                <div onlogin="myFacebookLogin()"
+                     class="fb-login-button" data-max-rows="1" data-size="large"
+                     data-button-type="login_with" data-show-faces="false"
+                     data-auto-logout-link="false" data-use-continue-as="false"></div>
+                    <div class="fb-login-message hide">Unable to log in. Please refresh the page and try again.</div>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <button type="submit" class="fb-logout center hide" onclick="logoutFacebook()">Logout</button>
+
+                </li>
             </ul>
         </nav>
         </section>
@@ -57,21 +82,42 @@
         {% if result.deleted_msg %}
             <p class="center">You have deleted the seating plan. You will need to re-submit the guest list to recreate the plan if you need to reference it again.</p>
         {% endif %}
-        <h1>Dining Tables Seating Chart Plan</h1>
+        <h1>Seating Chart Planner</h1>
 
-        <article class="exiting_jobs hide">
+        <article class="existing_jobs hide">
 
         </article>
 
         <article>
-            <h2>Submit Guest List</h2>
+            <h2></h2>
             <span style="display:block;">
-                <small>Having trouble figuring out where to fit all your guests? </small>
+                <small>Hosting a dining event, and having trouble figuring out where to fit all your guests? </small>
             </span>
             <span>
                 <small>Submit a spreadsheet containing your guests and we'll handle the table allocation.</small>
             </span>
-            <form method="post" enctype="multipart/form-data" action="review">
+
+            <div>
+                <h3>Creating the Guest List</h3>
+                <p>
+                    Create an Excel spreadsheet where you list your guest and organise them into groups.
+                    Name the groups, and write down the names as header of each column (the first row of the spreadsheet).
+                    Then list the names of guests in that group.
+                </p>
+                <p>
+                    A single person is allowed to be listed in multiple columns.
+                    E.g. In this wedding, "Hercule Poirot" is a classmate to both the groom and the bride, therefore he is listed in both columns.
+                </p>
+                <img src="static/example.PNG">
+
+                <div>Download a template guest list <a href="static/example.xlsx">here</a>.</div>
+                <div>Alternatively, we can <a href="/from_photos">initialise a guest list</a> based on who appears in your Facebook photos.</div>
+
+            </div>
+
+            <div>
+                <h3>Upload Guest List</h3>
+                <form method="post" enctype="multipart/form-data" action="review">
                 <fieldset>
                     <label for="file-upload">Guest List (.csv or .xlsx)</label>
                     <input id="file-upload" type="file" name="file">
@@ -82,40 +128,26 @@
                     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
                     <input type="submit" value="Upload">
                 </fieldset>
-            </form>
-            <div>
-                <h2>Need Instructions?</h2>
-                <h3>Creating the Guest List</h3>
-                <p>
-                    Upload an Excel file listing each group/community of guests.
-                    Write the name of the community as the header of each column. Then add names of guests in that community under that column.
-                </p>
-                <p>
-                    A single person is allowed to appear in multiple columns.
-                    E.g. In this wedding, "Hercule Poirot" is a classmate to both the groom and the bride, and appears in both columns.
-                </p>
-                <img src="static/example.PNG">
-
-
-                <div>Download a template guest list <a href="static/example.xlsx">here</a>.</div>
-                <div>Alternatively, we can <a href="/login">initialise a guest list</a> based on your Facebook photos.</div>
-
+                </form>
             </div>
 
-            <h3>Retrieve Results</h3>
-            <p>
-                If you submitted with logged in previously, simply login again to retrieve your seating plan.
-                Alternatively, you can retrieve a seating plan with the token?
-            </p>
+            <div class="retrieve-results">
+                <h3>Retrieve Results</h3>
+                <p>
+                    If you submitted a request while logged in previously, simply login again to retrieve your seating chart.
+                    Alternatively, you can retrieve a seating plan with the token?
+                </p>
 
-            <form method="get" enctype="multipart/form-data" action="retrieve">
-                <fieldset>
-                    <label for="job_id">Token</label>
-                  <input type="text" name="job_id" id="job_id">
 
-                 <input type="submit" value="Retrieve">
-                </fieldset>
-            </form>
+                <form method="get" enctype="multipart/form-data" action="retrieve">
+                    <fieldset>
+                        <label for="job_id">Token</label>
+                      <input type="text" name="job_id" id="job_id">
+
+                     <input type="submit" value="Retrieve">
+                    </fieldset>
+                </form>
+            </div>
         </article>
     </section>
 
