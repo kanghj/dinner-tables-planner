@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Binder of existing charts</title>
+</head>
+<body>
+    <article class="existing_jobs">
+        <h2>View your previous submissions</h2>
+        {% for job in jobs %}
+            <a href="/retrieve?job_id={{job.job_id}}">{{job.job_id}}</a>
+        {% endfor %}
+    </article>
+</body>
+</html>
