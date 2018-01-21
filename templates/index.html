@@ -14,12 +14,14 @@
     <script src="static/home.js"></script>
     <script>
       window.fbAsyncInit = function() {
-      FB.init({
+        FB.init({
           appId            : '{{fb_app_id}}',
           autoLogAppEvents : true,
           xfbml            : true,
           version          : 'v2.11'
         });
+
+        myFacebookLogin(function() {});
       };
 
       (function(d, s, id){
@@ -31,13 +33,17 @@
       }(document, 'script', 'facebook-jssdk'));
 
       // TODO check once page is ready
-      function myFacebookLogin() {
+      function myFacebookLogin(errCallback) {
           FB.getLoginStatus(function(response){
           // TODO check if login already
             if (response.status === 'connected') {
                 statusChangeCallback(response);
             } else {
-                $('.fb-login-message').removeClass('hide');
+                if (errCallback) {
+                    errCallback();
+                } else {
+                    $('.fb-login-message').removeClass('hide');
+                }
             }
           }, {scope: 'user_photos'});
       }
@@ -48,8 +54,6 @@
           window.location.reload();
         });
       }
-
-
 
     </script>
     <div id="fb-root"></div>
@@ -119,14 +123,14 @@
 
 
                 <div>Download a template guest list <a href="static/example.xlsx">here</a>.</div>
-                <div>Alternatively, we can <a href="/login">initialise a guest list</a> based on your Facebook photos.</div>
+                <div>Alternatively, we can <a href="/from_photos">initialise a guest list</a> based on your Facebook photos.</div>
 
             </div>
 
             <div class="retrieve-results">
                 <h3>Retrieve Results</h3>
                 <p>
-                    If you submitted with logged in previously, simply login again to retrieve your seating plan.
+                    If you submitted a request while logged in previously, simply login again to retrieve your seating chart.
                     Alternatively, you can retrieve a seating plan with the token?
                 </p>
             </div>

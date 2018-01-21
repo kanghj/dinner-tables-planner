@@ -110,7 +110,7 @@ def solve():
         <title>Dining Tables Seating Chart Plan - Token and Further Instructions</title>
         <link rel="stylesheet"
     href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="static/favicon.ico">
     </head>
     <body>
         <p>
@@ -249,9 +249,9 @@ def delete():
     return redirect('/?message=deleted')
 
 
-@app.route('/login')
+@app.route('/from_photos')
 def login():
-    return render_template('login.html', fb_app_id=fb_app_id)
+    return render_template('from_photos.html', fb_app_id=fb_app_id)
 
 
 @app.route('/template_spreadsheet', methods=['POST'])
