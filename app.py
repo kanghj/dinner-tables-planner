@@ -297,6 +297,10 @@ def csrf_protect():
             print('csrf token missing or invalid', file=sys.stderr)
             abort(403)
 
+@app.before_request
+def before_request():
+    if not request.url.startswith('https'):
+        return redirect(request.url.replace('http', 'https', 1))
 
 def generate_csrf_token():
     if '_csrf_token' not in session:
