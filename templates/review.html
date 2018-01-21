@@ -36,6 +36,7 @@
                     <input class="hide" type="checkbox" name="{{loop.index}}_clique_name" value="{{clique_name}}" checked>
                 {% endfor %}
                 <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+                <input id="facebook_access_token" name="facebook_access_token" type="hidden" value="{{ facebook_access_token }}">
                 <input type="submit" name="submit" value="Finalise">
             </fieldset>
 

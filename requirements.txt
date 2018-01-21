@@ -2,3 +2,7 @@ Flask==0.12.2
 gunicorn==19.7.1
 boto3==1.4.8
 openpyxl==2.4.9
+psycopg2==2.7.3.2
+SQLAlchemy==1.2.1
+flask-sqlalchemy==2.3.2
+facebook-sdk==2.0.0
