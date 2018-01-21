@@ -16,8 +16,12 @@ from excel_converter import make_workbook
 from accounts import db, users
 import random
 from collections import defaultdict
+from flask_sslify import SSLify
 
 app = Flask(__name__, static_url_path='/static')
+
+if 'DYNO' in os.environ: # only trigger SSLify if the app is running on Heroku
+    sslify = SSLify(app)
 
 app.secret_key = os.environ['FLASK_SECRET']
 fb_app_id = os.environ['FB_APP_ID']
@@ -296,11 +300,6 @@ def csrf_protect():
         if not token or token != request.form.get('_csrf_token'):
             print('csrf token missing or invalid', file=sys.stderr)
             abort(403)
-
-@app.before_request
-def before_request():
-    if not request.url.startswith('https'):
-        return redirect(request.url.replace('http', 'https', 1))
 
 def generate_csrf_token():
     if '_csrf_token' not in session:
