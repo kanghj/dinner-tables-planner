@@ -33,7 +33,7 @@
       }(document, 'script', 'facebook-jssdk'));
 
       // TODO check once page is ready
-      function myFacebookLogin(errCallback) {
+      function facebookLogin(errCallback) {
           FB.getLoginStatus(function(response){
           // TODO check if login already
             if (response.status === 'connected') {
@@ -61,10 +61,11 @@
         <nav>
             <ul>
                 <li>
-                <div onlogin="myFacebookLogin()"
+                <div onlogin="facebookLogin()"
                      class="fb-login-button" data-max-rows="1" data-size="large"
                      data-button-type="login_with" data-show-faces="false"
-                     data-auto-logout-link="false" data-use-continue-as="false"></div>
+                     data-auto-logout-link="false" data-use-continue-as="false"
+                     data-scope="user_photos"></div>
                     <div class="fb-login-message hide">Unable to log in. Please refresh the page and try again.</div>
                 </li>
             </ul>
