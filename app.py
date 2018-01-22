@@ -281,6 +281,11 @@ def privacy():
     return send_from_directory('static', 'privacy.html')
 
 
+@app.route('/terms', methods=['GET'])
+def terms():
+    return send_from_directory('static', 'terms.html')
+
+
 def verify_facebook_access_token_and_get_user_id(access_token = None):
     if access_token is None and request.form['facebook_access_token']:
         fb_access_token = request.form['facebook_access_token']
