@@ -9,7 +9,7 @@
         <h2>View your previous submissions</h2>
         <p>If you already submitted a guest list, retrieve it here</p>
         {% for job in jobs %}
-            <a href="/retrieve?job_id={{job.job_id}}">{{job.job_id}}</a>
+            <a class="job_id_link" href="/retrieve?job_id={{job.job_id}}">{{job.job_id}}</a>
         {% endfor %}
     </article>
 </body>
