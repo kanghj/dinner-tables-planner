@@ -16,6 +16,10 @@ function fetchExistingJobs(accessToken) {
       var responseNodes = $.parseHTML(response);
       var $responseNodes = $(responseNodes);
       $('.existing_jobs').replaceWith($responseNodes.filter('.existing_jobs')[0]);
+
+      if ($('.job_id_link').length === 0) {
+        $('.existing_jobs').addClass('hide');
+      }
   });
 
 }
