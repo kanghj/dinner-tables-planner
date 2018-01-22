@@ -24,9 +24,6 @@ function getPhotos(response) {
       }).then(function() {
         fetchPhotos('/me/photos');
 
-        if (accumulator.length === 0) {
-            throw new Error('No publicly accessible photos were available. Please manually fill in template from the home page.');
-        }
       }).catch(function(reason) {
         $('#status').text(reason);
       });
@@ -51,6 +48,9 @@ function getPhotos(response) {
         if (next) {
             FB.api(next, function(response) {
                 if (!response.paging) {
+                     if (accumulator.length === 0) {
+                        throw new Error('No publicly accessible photos were available. Please manually fill in template from the home page.');
+                    }
                     return;
                 }
                 fetchPhotos(response.paging.next, response);
