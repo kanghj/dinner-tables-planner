@@ -48,8 +48,12 @@
           }, {scope: 'user_photos'});
       }
 
-
-
+      function logoutFacebook(event) {
+            FB.logout(function(response) {
+              deleteFbCookie("fblo_" + {{fb_app_id}});
+              window.location.reload();
+            });
+      }
     </script>
     <div id="fb-root"></div>
     <header>
