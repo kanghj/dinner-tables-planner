@@ -49,12 +49,11 @@
       }
 
       function logoutFacebook(event) {
-        FB.logout(function(response) {
-          deleteFbCookie("fblo_" + {{fb_app_id}});
-          window.location.reload();
-        });
+            FB.logout(function(response) {
+              deleteFbCookie("fblo_" + {{fb_app_id}});
+              window.location.reload();
+            });
       }
-
     </script>
     <div id="fb-root"></div>
     <header>
