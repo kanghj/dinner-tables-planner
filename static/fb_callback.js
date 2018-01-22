@@ -45,7 +45,12 @@ function getPhotos(response) {
         }
 
         if (next) {
-            FB.api(next, function(response) { fetchPhotos(response.paging.next, response); });
+            FB.api(next, function(response) {
+                if (!response.paging) {
+                    return;
+                }
+                fetchPhotos(response.paging.next, response);
+            });
         } else {
             fetchTaggedPeople(accumulator);
         }

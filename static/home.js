@@ -5,6 +5,12 @@ function statusChangeCallback(response) {
       $('.fb-login-button').parent().addClass('hide');
       fetchExistingJobs(response.authResponse.accessToken);
 }
+function logoutFacebook(event) {
+    FB.logout(function(response) {
+      deleteFbCookie("fblo_" + {{fb_app_id}});
+      window.location.reload();
+    });
+}
 
 function fetchExistingJobs(accessToken) {
 
