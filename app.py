@@ -429,8 +429,10 @@ def shutdown_session(exception=None):
 @app.after_request
 def add_header(response):
     """
-    Ask browsers to not cache the rendered page.
+    Cache
     """
-
-    response.headers['Cache-Control'] = 'public, max-age=0'
+    if 'html' in response.mimetype:
+        response.headers['Cache-Control'] = 'no-cache'
+    else:
+        response.headers['Cache-Control'] = 'public, max-age=86400'
     return response
