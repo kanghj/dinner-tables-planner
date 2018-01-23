@@ -4,6 +4,9 @@ $(document).ready(function() {
         .attr('disabled', 'disabled')
         .val('Submitting...');
     });
+     $('#see-original-clique-names').click(function(event) {
+        $('.community-tag').toggleClass('show');
+    });
 });
 
 /**
