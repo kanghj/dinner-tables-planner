@@ -11,7 +11,26 @@
 
 </head>
 <body>
+    <script>
+    window.fbAsyncInit = function() {
+        FB.init({
+          appId            : '{{fb_app_id}}',
+          autoLogAppEvents : true,
+          xfbml            : true,
+          version          : 'v2.11'
+        });
 
+        facebookLogin(function() {});
+      };
+
+      (function(d, s, id){
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) {return;}
+          js = d.createElement(s); js.id = id;
+          js.src = "https://connect.facebook.net/en_US/sdk.js";
+          fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    </script>
 
     <section>
         <article>
@@ -38,10 +57,17 @@
 
     </section>
 
+    <div id="image-dialog" class="hide">
+        <img id="image-on-hover" src="">
+    </div>
 
     <script>
         var communities = $('#communities').val();
         var persons = $('#persons').val();
+        var alreadyRetrieved = null;
+
+        var linksOfImages = {};
+        var fbPictureLinkOfImages = {};
 
         $('#template_spreadsheet_contents').submit(function(event) {
             event.preventDefault(); // no submission
@@ -51,6 +77,8 @@
                 data: $(this).serialize(),
                 success: function (data) {
                     $("#contents").html(data);
+                    if (FB != null)
+                        facebookLogin();
                 },
                 error: function (jXHR, textStatus, errorThrown) {
 
@@ -59,6 +87,76 @@
         });
 
         $('#template_spreadsheet_contents').submit();
+
+
+        function facebookLogin(errCallback) {
+              if (alreadyRetrieved != null && alreadyRetrieved) {
+                return;
+              }
+              alreadyRetrieved = true;
+              FB.getLoginStatus(function(response){
+              // TODO check if login already
+                if (response.status === 'connected') {
+                    statusChangeCallback(response);
+                } else {
+                    if (errCallback) {
+                        errCallback();
+                    } else {
+                        $('.fb-login-message').removeClass('hide');
+                    }
+                }
+              }, {scope: 'user_photos'});
+        }
+
+        function statusChangeCallback(response) {
+            fetchExistingPhotos(response.authResponse.accessToken);
+        };
+
+        function fetchExistingPhotos(accessToken) {
+            var values = $('.community-tag')
+            var photoIds = []
+            for (value of values) {
+                photoIds.push($(value).data('photo-id'));
+            }
+            photoIds = new Set(photoIds);
+            for (photoId of photoIds) {
+                FB.api(photoId + '?fields=picture,link', function(response) {
+                    console.log(response);
+                    linksOfImages[response.id] = response.link;
+                    fbPictureLinkOfImages[response.id] = response.picture;
+                });
+            }
+
+            $('.community-tag').click(function(event) {
+
+                var photoId = $(event.target).data('photo-id');
+                var url = linksOfImages[photoId];
+                window.open(url, '_blank');
+
+            });
+
+            $('.community-tag').hover(function(event) {
+                function getOffset(el) {
+                      el = el.getBoundingClientRect();
+                      return {
+                        left: el.left + window.scrollX,
+                        top: el.top + window.scrollY
+                      }
+                    }
+
+
+                $('#image-dialog').removeClass('hide')
+                .css('top', getOffset(event.target).top)
+                .css('left', getOffset(event.target).left + event.target.offsetWidth);
+
+                var photoId = $(event.target).data('photo-id');
+                var image = fbPictureLinkOfImages[photoId];
+
+                $('#image-on-hover').attr('src', image);
+
+            });
+
+        }
 
     </script>
 

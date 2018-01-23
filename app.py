@@ -266,7 +266,8 @@ def login():
 def template_spreadsheet():
     return render_template('template_spreadsheet.html',
                            communities=request.form['communities'],
-                           persons=request.form['persons'])
+                           persons=request.form['persons'],
+                           fb_app_id=fb_app_id)
 
 
 @app.route('/template_spreadsheet_contents', methods=['POST'])
@@ -326,7 +327,9 @@ def template_spreadsheet_contents():
 
             for community in communities:
                 colour = colours[community]
-                body_html += '<small class="community-tag" style="color:' + colour + '"> Photo ' + str(community_names.index(community)) + '</span>'
+                body_html += '<a href="#"><small class="community-tag" style="color:' + colour + '" data-photo-id="' + \
+                             str(community) \
+                             + '"> Photo ' + str(community_names.index(community)) + '</small><a>'
 
             body_html += '</td>'
 
