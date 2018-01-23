@@ -1,3 +1,4 @@
+import html
 import json
 import uuid
 import sys
@@ -263,13 +264,107 @@ def login():
 
 @app.route('/template_spreadsheet', methods=['POST'])
 def template_spreadsheet():
+    return render_template('template_spreadsheet.html',
+                           communities=request.form['communities'],
+                           persons=request.form['persons'],
+                           fb_app_id=fb_app_id)
+
+
+@app.route('/template_spreadsheet_contents', methods=['POST'])
+def template_spreadsheet_contents():
+    def r():
+        return random.randint(0,255)
+
+    communities_json = json.loads(request.form['communities'])
+    community_names = list(communities_json.keys())
+    persons = json.loads(request.form['persons'])
+
+    # merge similar communities
+    communities = {key: set(members) for key, members in communities_json.items()}
+    colours = {}
+    for community_key in communities.keys():
+        colour = '#%02X%02X%02X' % (r(),r(),r())
+        colours[community_key] = colour
+
+    person_to_community = defaultdict(list)
+    for key, members in communities.items():
+        for member in members:
+            person_to_community[member].append(key)
+
+    merged_communities = merge_similar(communities)
+
+    merged_communities = {key: sorted(list(members)) for key, members in merged_communities.items()}
+
+    html_response = "<table>"
+    headers = [str(i) for i in range(1, len(communities) + 1)]
+    headers_html = "<tr>" + "".join(
+        ["<th> Group " + j + "</th>" for j in headers]) + "</tr>"
+    html_response += headers_html
+    body_html = ""
+
+    largest_community_size = max([len(community) for community in merged_communities.values()])
+    for i in range(0, largest_community_size):
+        body_html += "<tr>"
+
+        for community_num in merged_communities.keys():
+            try:
+                person_ids = merged_communities[community_num]
+            except KeyError:
+                body_html += '<td>' + "---" + '</td>'
+                continue
+            try:
+                person_id = person_ids[i]
+            except IndexError:
+                body_html += '<td>' + "---" + '</td>'
+                continue
+
+            person_name = persons[int(person_id)]
+
+            communities = person_to_community[person_id]
+
+            body_html += '<td class="{}">'.format('has-multiple' if len(communities) > 0 else '')
+            body_html += person_name
+
+            for community in communities:
+                colour = colours[community]
+                body_html += '<a href="#"><small class="community-tag" style="color:' + colour + '" data-photo-id="' + \
+                             str(community) \
+                             + '"> Photo ' + str(community_names.index(community)) + '</small><a>'
+
+            body_html += '</td>'
+
+        body_html += "</tr>"
+
+    html_response = html_response + body_html + "</table>"
+
+    html_response += """<form id="template_spreadsheet_download" action="template_spreadsheet_download" method="POST">'
+                <input type="hidden" name="communities" value="{}">
+
+                <input type="hidden" name="persons" value="{}">
+                <input name=_csrf_token type=hidden value="{}">
+
+                <input class="" type="submit" value="Download">
+
+            </form>""".format(html.escape(request.form['communities']), html.escape(request.form['persons']), generate_csrf_token())
+
+    return app.response_class(
+            response=html_response,
+            status=200,
+            mimetype='text/html_response'
+        )
+
+
+@app.route('/template_spreadsheet_download', methods=['POST'])
+def template_spreadsheet_download():
     communities_json = json.loads(request.form['communities'])
     persons = json.loads(request.form['persons'])
 
     # merge similar communities
-    communities = {key : set(members) for key, members in communities_json.items()}
+    communities = {i + 1 : set(members) for i, (key, members) in enumerate(communities_json.items())}
 
     communities = merge_similar(communities)
+
+    communities = {key : sorted(members) for key, members in communities.items()}
 
     bytes_xlsx = make_workbook(persons, communities)
     return send_file(bytes_xlsx, attachment_filename="guest_list.xlsx",
@@ -296,7 +391,6 @@ def verify_facebook_access_token_and_get_user_id(access_token = None):
     return debug_data['data']['user_id']
 
 
-
 def get_facebook_app_access_token():
     return facebook.get_app_access_token(fb_app_id, fb_app_secret)
 
@@ -307,6 +401,7 @@ def csrf_protect():
         token = session.pop('_csrf_token', None)
         if not token or token != request.form.get('_csrf_token'):
             print('csrf token missing or invalid', file=sys.stderr)
+
             abort(403)
 
 def generate_csrf_token():
@@ -334,8 +429,8 @@ def shutdown_session(exception=None):
 @app.after_request
 def add_header(response):
     """
-    Ask browsers to cache the rendered page for 10 minutes.
+    Ask browsers to not cache the rendered page.
     """
 
-    response.headers['Cache-Control'] = 'public, max-age=600'
+    response.headers['Cache-Control'] = 'public, max-age=0'
     return response
