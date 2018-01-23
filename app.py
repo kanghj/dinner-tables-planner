@@ -395,6 +395,15 @@ def get_facebook_app_access_token():
     return facebook.get_app_access_token(fb_app_id, fb_app_secret)
 
 
+@app.errorhandler(404)
+def four_zero_four(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def five_hundred(e):
+    return render_template('500.html'), 404
+
+
 @app.before_request
 def csrf_protect():
     if request.method == "POST":
