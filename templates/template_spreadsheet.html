@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seating Chart Plan - Template Spreadsheet</title>
+    <link rel="stylesheet" type="text/css" href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.2.5.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/basic.css?date={{yearmonth}}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="static/common.js"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+</head>
+<body>
+
+
+    <section>
+        <article>
+            <form id="template_spreadsheet_contents" action="template_spreadsheet_contents" method="POST">
+                <input type="hidden" id="communities" name="communities" value="{{communities}}">
+
+                <input type="hidden" id="persons" name="persons" value="{{persons}}">
+
+                <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+            </form>
+
+            <label class="right">
+                <input type="checkbox" name="see-original-clique-names" id="see-original-clique-names">
+                Show each person with photos they appear in (hover over the photo to view it)
+            </label>
+            <div id="contents">
+
+            </div>
+
+
+
+
+        </article>
+
+    </section>
+
+
+    <script>
+        var communities = $('#communities').val();
+        var persons = $('#persons').val();
+
+        $('#template_spreadsheet_contents').submit(function(event) {
+            event.preventDefault(); // no submission
+            $.ajax({
+                url : $(this).attr('action'),
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (data) {
+                    $("#contents").html(data);
+                },
+                error: function (jXHR, textStatus, errorThrown) {
+
+                }
+            });
+        });
+
+        $('#template_spreadsheet_contents').submit();
+
+    </script>
+
+</body>
+</html>
