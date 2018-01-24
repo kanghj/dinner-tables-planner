@@ -108,3 +108,12 @@ function getPhotos(response) {
         $('form').submit();
     }
 }
+
+$(document).ready(function() {
+    $('button').click(function(event) {
+        $('button')
+        .attr('disabled', 'disabled')
+        .attr('type', 'reset') // css hack to make button appear grey
+        .val('Building...');
+    });
+});
