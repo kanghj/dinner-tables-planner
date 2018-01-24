@@ -42,6 +42,13 @@
       }, {scope: 'user_photos'});
   }
 
+  $('button').click(function(event) {
+            $('button')
+            .attr('disabled', 'disabled')
+            .attr('type', 'reset') // css hack to make button appear grey
+            .val('Building...');
+        });
+
 </script>
 <script src="static/fb_callback.js?date={{yearmonth}}"></script>
 <section>
