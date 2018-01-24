@@ -35,7 +35,7 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
     num_persons = len({member for members in community.values()
                        for member in members})
-    num_tables = math.ceil(num_persons / table_size)
+    num_tables = max(math.ceil(num_persons / table_size), len(community))
 
     new_table_sz = [table_size for i in range(0, num_tables)]
     new_community: typing.MutableMapping[int, typing.List[int]] \

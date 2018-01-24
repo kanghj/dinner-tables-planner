@@ -92,7 +92,6 @@ class CoarserTest(TestCase):
 
         print(new_community)
         print(coarse_to_original)
-        self.assertCountEqual(new_table_sz, [5, 5])
 
         self.assertTrue(0 in coarse_to_original.keys())
         self.assertTrue(7 in coarse_to_original.keys())
