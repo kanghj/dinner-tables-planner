@@ -118,6 +118,7 @@ def solve():
     <link rel="shortcut icon" href="static/favicon.ico">
     </head>
     <body>
+        <article>
         <p>
         Your token is <strong>{}</strong>. If you were not logged-in to Facebook when submitting the guest list, please copy and paste it somewhere for future reference.
         </p>
@@ -128,6 +129,8 @@ def solve():
         Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after {}
         minutes to collect our proposed seating plan to your event.
         </p>
+        </article>
+        <a href="/">Back to Home</a>
     </body>
     """
     return app.response_class(
