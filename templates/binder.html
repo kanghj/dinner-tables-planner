@@ -8,9 +8,11 @@
     <article class="existing_jobs">
         <h2>View your previous submissions</h2>
         <p>If you already submitted a guest list, retrieve your seating plan here: </p>
+        <ol>
         {% for job in jobs %}
-            <a class="job_id_link" href="/retrieve?job_id={{job.job_id}}">{{job.job_id}}</a>
+            <li><a class="job_id_link" href="/retrieve?job_id={{job.job_id}}">{{job.job_id}}</a></li>
         {% endfor %}
+        </ol>
     </article>
 </body>
 </html>
