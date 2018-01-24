@@ -250,7 +250,7 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
 
 def partition(community, job_id, persons, table_size, clique_weights):
     new_table_sz, new_community, coarse_to_original, presolved = \
-        coarse_local(community, table_size)
+        coarse_local(community, table_size, clique_weights)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
         persons, presolved, clique_weights)

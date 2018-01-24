@@ -272,3 +272,20 @@ class SolverTest(TestCase):
         self.assertTrue([1, 2, 3] in resulting_groups)
         self.assertTrue([4, 6] in resulting_groups)
         self.assertTrue([7, 8, 9] in resulting_groups)
+
+    def test_partition_with_one_column_of_clique_weight_zero(self):
+
+        community = {
+            0: [0, 1, 2],
+            1: [3, 4, 5],
+            2: [6, 7, 8, 9]
+        }
+        persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        assert len(persons) == 10
+        tables, persons = partition(community, str(uuid.uuid4()), persons, 5, {0: 1, 1: 1, 2:0})
+
+        resulting_groups = [sorted(values) for values in tables.values()]
+
+        # these are not the only right answers, there can be other right ones
+        self.assertTrue([0, 1, 2, 6, 7] in resulting_groups)
+        self.assertTrue([3, 4, 5, 8, 9] in resulting_groups)
