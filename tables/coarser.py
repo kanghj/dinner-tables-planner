@@ -18,7 +18,8 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int,
 
 
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
-                 table_size: int):
+                 table_size: int,
+                 clique_weights = None):
     """
     Coarses local communities of
         fully-connected persons connected to same cliques into nodes.
@@ -29,6 +30,9 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
         mapping of coarse_node back to original persons, and
         prefined atoms assigning the nodes to tables with decreased sizes)
     """
+    if clique_weights is None:
+        clique_weights = defaultdict(lambda: 1)
+
     num_persons = len({member for members in community.values()
                        for member in members})
     num_tables = math.ceil(num_persons / table_size)
@@ -48,6 +52,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     for clique_name, members in community.items():
         for member in members:
             cliques_of_person[member].append(clique_name)
+        if clique_weights[clique_name] == 0:
+            continue
         for member1, member2 in itertools.product(members, members):
             # if member1 != member2:
             members_cooccurence[member1][member2] += 1

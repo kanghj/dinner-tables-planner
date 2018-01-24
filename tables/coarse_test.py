@@ -147,3 +147,27 @@ class CoarserTest(TestCase):
         self.assertEquals([2, 3], coarse_to_original[2])
 
         self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
+
+    def test_coarse_ignore_cliques_with_weight_eq_zero(self):
+        community = {
+            0: [0, 1, 2, 3],
+            1: [2, 3, 4, 5]
+
+        }
+        table_size = 3
+        clique_weights = {
+            0: 1,
+            1: 0
+        }
+        new_table_sz, new_community, coarse_to_original, presolved_facts = \
+            coarse_local(community, table_size, clique_weights)
+
+        print(new_community)
+        print(coarse_to_original)
+
+        self.assertEquals([0, 1], coarse_to_original[0])
+        self.assertEquals([2], coarse_to_original[2])
+        self.assertEquals([3], coarse_to_original[3])
+        self.assertEquals([4], coarse_to_original[4])
+
+        self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
