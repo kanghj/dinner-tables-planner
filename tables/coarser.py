@@ -19,7 +19,7 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int,
 
 def coarse_local(community: typing.Mapping[int, typing.List[int]],
                  table_size: int,
-                 clique_weights = None):
+                 clique_weights=None):
     """
     Coarses local communities of
         fully-connected persons connected to same cliques into nodes.
@@ -35,6 +35,9 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
     num_persons = len({member for members in community.values()
                        for member in members})
+
+    # upper bound for num_tables
+    # the true num tables is determined in asp
     num_tables = max(math.ceil(num_persons / table_size), len(community))
 
     new_table_sz = [table_size for i in range(0, num_tables)]

@@ -1,5 +1,8 @@
 total_persons(10).
-total_tables(4).
+
+total_tables_min(3).
+total_tables_max(6).
+
 person(1..N) :- total_persons(N).
 person_size(P, 1) :- person(P).
 

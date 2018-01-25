@@ -8,6 +8,7 @@ import tempfile
 import boto3
 import json
 
+import math
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
 from openpyxl import load_workbook
@@ -18,7 +19,8 @@ s3 = boto3.client('s3')
 
 
 def represent_in_asp(coarse_to_original, new_community,
-                     new_table_sz, persons, presolved, clique_weights):
+                     new_table_sz, persons, presolved,
+                     clique_weights, table_size):
     facts = []
     for key, members in coarse_to_original.items():
         facts.append('person({}).'.format(key))
@@ -27,7 +29,13 @@ def represent_in_asp(coarse_to_original, new_community,
         facts.append('person_size({}, {}).'.format(
             key, 1 if already_assigned_to_table else len(members)))
 
-    facts.append('total_tables({}).'.format(len(new_table_sz)))
+    # facts.append('total_tables({}).'.format(len(new_table_sz)))
+    num_original_persons = len(coarse_to_original.values())
+
+    facts.append('total_tables_min({}).'.format(
+        min(math.ceil(num_original_persons / table_size), len(new_table_sz))))
+    facts.append('total_tables_max({}).'.format(
+        max(math.ceil(num_original_persons / table_size), len(new_table_sz))))
     facts.append('cliques({}).'.format(len(new_community.keys())))
     clique_list = [clique for clique in new_community.keys()]
     for table_num, table_sz in enumerate(new_table_sz):
@@ -219,7 +227,7 @@ def create_file_and_upload_to_s3(job_id, clique_weights_raw):
         coarse_local(community, table_size, clique_weights)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        persons, presolved, clique_weights)
+        persons, presolved, clique_weights, table_size)
 
     facts = add_solving_atoms(facts)
     s3.put_object(Bucket='dining-tables-chart',
@@ -253,7 +261,7 @@ def partition(community, job_id, persons, table_size, clique_weights):
         coarse_local(community, table_size, clique_weights)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
-        persons, presolved, clique_weights)
+        persons, presolved, clique_weights, table_size)
 
     resp_text = solve_by_clingo(facts, job_id)
 
