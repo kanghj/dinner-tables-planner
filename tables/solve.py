@@ -9,6 +9,8 @@ import boto3
 import json
 
 import math
+
+import sys
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
 from openpyxl import load_workbook
@@ -30,7 +32,7 @@ def represent_in_asp(coarse_to_original, new_community,
             key, 1 if already_assigned_to_table else len(members)))
 
     # facts.append('total_tables({}).'.format(len(new_table_sz)))
-    num_original_persons = len(coarse_to_original.values())
+    num_original_persons = len([value for values in coarse_to_original.values() for value in values ])
 
     facts.append('total_tables_min({}).'.format(
         min(math.ceil(num_original_persons / table_size), len(new_table_sz))))
@@ -44,8 +46,9 @@ def represent_in_asp(coarse_to_original, new_community,
     for community_name, members in new_community.items():
         clique_number = clique_list.index(community_name) + 1
 
-        weight = clique_weights[community_name]\
+        weight = clique_weights[community_name] \
             if community_name in clique_weights else 1
+
         clique_weight_fact = 'clique_weight({}, {}).'.format(
             clique_number, weight)
         if clique_weight_fact not in facts:
@@ -105,7 +108,7 @@ def community_and_persons_from_file(path, filetype):
                     col_name = cell.value
                     clique_names.append(col_name)
                     continue
-                if cell.value is None or len(cell.value) == 0:
+                if cell.value is None or (isinstance(cell.value, str) and len(cell.value) == 0):
                     continue
                 if cell.value not in persons:
                     persons.append(cell.value)
@@ -220,11 +223,12 @@ def create_file_and_upload_to_s3(job_id, clique_weights_raw):
             Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
 
     # convert keys of clique_weights to use the clique numbers instead
-    clique_weights = {str(clique_names.index(key) + 1): values
+    clique_weights = {str(clique_names.index(key) + 1): int(values)
                       for key, values in clique_weights_raw.items()}
 
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size, clique_weights)
+    print(clique_weights, file=sys.stderr)
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
         persons, presolved, clique_weights, table_size)

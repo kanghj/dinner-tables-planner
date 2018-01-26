@@ -229,7 +229,7 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
             communities = coarse_to_community[int(original_to_coarse[person_id])]
 
             body_html += '<td class="{}">'.format('has-multiple' if len(communities) > 0 else '')
-            body_html += person_name
+            body_html += str(person_name)
 
             for community in communities:
                 colour = colours[community]
