@@ -562,3 +562,4 @@ in_table(189,32).
 
 person_size(P, 1) :- person(P).
 
+can_violate_isolation_rule(A) :- person(A).

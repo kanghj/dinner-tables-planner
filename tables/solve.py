@@ -67,8 +67,12 @@ def represent_in_asp(coarse_to_original, new_community,
                 facts.append(fact)
 
     for presolved_fact in presolved:
-        fact = '{}({},{}).'.format(
-            presolved_fact[0], presolved_fact[1], presolved_fact[2])
+        if len(presolved_fact) > 2:
+            fact = '{}({},{}).'.format(
+                presolved_fact[0], presolved_fact[1], presolved_fact[2])
+        else:
+            fact = '{}({}).'.format(
+                presolved_fact[0], presolved_fact[1])
         if fact not in facts:
             facts.append(fact)
 
@@ -112,7 +116,7 @@ def community_and_persons_from_file(path, filetype):
                     continue
                 if cell.value is None or \
                         (isinstance(cell.value, str) and
-                                 len(cell.value) == 0):
+                         len(cell.value) == 0):
                     continue
                 if cell.value not in persons:
                     persons.append(cell.value)

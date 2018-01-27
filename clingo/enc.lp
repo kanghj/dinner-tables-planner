@@ -33,8 +33,7 @@ minimum_isolation_size(1).
 
 %% counter(C, A, P) :- clique(C), in_clique(A, C), P = {person(B) :in_clique(B, C) , in_table(A, T), in_table(B, T), table(T)}.
 
-
-violates_isolation_rule(A) :- person(A), #sum {PS, B : person_size(B, PS), in_clique(B, C), in_table(A, T), in_table(B, T), table(T), clique(C), in_clique(A, C)} <= S, minimum_isolation_size(S).
+violates_isolation_rule(A) :- can_violate_isolation_rule(A), #sum {PS, B : person_size(B, PS), in_clique(B, C), in_table(A, T), in_table(B, T), table(T), clique(C), in_clique(A, C)} <= S, minimum_isolation_size(S).
 
 clique_size(C, N) :- clique(C), N = #sum { W, A: person_size(A, W), in_clique(A, C)}.
 

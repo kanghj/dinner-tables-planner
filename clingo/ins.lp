@@ -4,6 +4,7 @@ total_tables_min(3).
 total_tables_max(6).
 
 person(1..N) :- total_persons(N).
+can_violate_isolation_rule(P) :- person(P).
 person_size(P, 1) :- person(P).
 
 cliques(3).

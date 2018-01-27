@@ -99,6 +99,9 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             node_to_persons[clique_rep] = members
             new_community[clique].append(clique_rep)
 
+            if clique_weights[clique] != 0:
+                presolved_facts.append(
+                    ('can_violate_isolation_rule', clique_rep, ))
             # if clique_rep in clique_rep_already_in_table:
             #    already assigned this clique a table
             #    continue

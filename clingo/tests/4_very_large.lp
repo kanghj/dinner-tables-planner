@@ -2,6 +2,7 @@ total_persons(300).
 total_tables(30).
 cliques(10).
 person(1..N) :- total_persons(N).
+can_violate_isolation_rule(A) :- person(A).
 
 clique_weight(C, 1) :- clique(C).
 

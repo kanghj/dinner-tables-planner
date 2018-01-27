@@ -1,5 +1,6 @@
 total_persons(90).
 total_tables(9).
+can_violate_isolation_rule(A) :- person(A).
 cliques(9).
 
 in_clique(1..10, 1).
