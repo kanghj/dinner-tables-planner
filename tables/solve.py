@@ -32,7 +32,9 @@ def represent_in_asp(coarse_to_original, new_community,
             key, 1 if already_assigned_to_table else len(members)))
 
     # facts.append('total_tables({}).'.format(len(new_table_sz)))
-    num_original_persons = len([value for values in coarse_to_original.values() for value in values ])
+    num_original_persons = len(
+        [value for values in coarse_to_original.values()
+         for value in values])
 
     facts.append('total_tables_min({}).'.format(
         min(math.ceil(num_original_persons / table_size), len(new_table_sz))))
@@ -108,7 +110,9 @@ def community_and_persons_from_file(path, filetype):
                     col_name = cell.value
                     clique_names.append(col_name)
                     continue
-                if cell.value is None or (isinstance(cell.value, str) and len(cell.value) == 0):
+                if cell.value is None or \
+                        (isinstance(cell.value, str) and
+                                 len(cell.value) == 0):
                     continue
                 if cell.value not in persons:
                     persons.append(cell.value)
