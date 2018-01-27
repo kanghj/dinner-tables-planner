@@ -10,7 +10,6 @@ import json
 
 import math
 
-import sys
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
 from openpyxl import load_workbook
@@ -236,7 +235,7 @@ def create_file_and_upload_to_s3(job_id, clique_weights_raw):
 
     new_table_sz, new_community, coarse_to_original, presolved = \
         coarse_local(community, table_size, clique_weights)
-    print(clique_weights, file=sys.stderr)
+
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
         persons, presolved, clique_weights, table_size)
