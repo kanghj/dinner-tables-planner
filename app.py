@@ -120,21 +120,21 @@ def solve():
     <body>
         <article>
         <p>
-        Your token is <strong>{}</strong>. If you were not logged-in to Facebook when submitting the guest list, please copy and paste it somewhere for future reference.
+        Your token is <strong>{}</strong>. If you were not logged-in to Facebook when submitting the guest list, please copy and paste it somewhere for retrieving the seating chart in future.
         </p>
         <p>
-        We will need some time to process your guest list and plan a sitting arrangement.
+        We will need some time to process your guest list and plan the sitting arrangement for your seating chart.
         </p>
         <p>
-        Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after {}
-        minutes to collect our proposed seating plan to your event.
+        Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after ~{}
+        hours to collect our proposed seating plan to your event.
         </p>
         </article>
         <a href="/">Back to Home</a>
     </body>
     """
     return app.response_class(
-        response=page_html.format(job_id, job_id, '30'),
+        response=page_html.format(job_id, job_id, '5'),
         status=200,
         mimetype='text/html'
     )
@@ -229,7 +229,7 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
             communities = coarse_to_community[int(original_to_coarse[person_id])]
 
             body_html += '<td class="{}">'.format('has-multiple' if len(communities) > 0 else '')
-            body_html += person_name
+            body_html += str(person_name)
 
             for community in communities:
                 colour = colours[community]
