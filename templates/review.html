@@ -27,7 +27,9 @@
         <form action="solve" method="POST">
             <input type="hidden" name="job_id" value="{{job_id}}">
 
-            <h3>How important is it that these members of these groups stay together?</h3>
+            <h3>How important is it that people within each group sit together?</h3>
+            <small>Give '0' if the people within a group do not need to sit together at all</small>
+            <small>Give '-1' if its the people within a group SHOULD NOT sit together</small>
             <fieldset>
                 <input type="hidden" name="num_cliques" value="{{clique_names|length}}">
                 {% for clique_name in clique_names %}

@@ -17,8 +17,8 @@ def solve_by_clingo(atoms):
     clingo_path = '/usr/local/bin/clingo-5.2.2-linux-x86_64/clingo'
     os.chmod(clingo_path, 0o555)
 
-    proc = subprocess.Popen([clingo_path, '-t 4',
-                             '--time-limit=18000', '--stat'],
+    proc = subprocess.Popen([clingo_path, '-t 8',
+                             '--time-limit=36000'],
                             stdout=subprocess.PIPE,  stdin=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
 
     return proc.communicate(input = atoms)
