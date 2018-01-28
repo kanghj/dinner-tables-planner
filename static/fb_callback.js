@@ -2,7 +2,7 @@ function getPhotos(response) {
     if (response.status === 'connected') {
       new Promise(function(resolve, reject) {
           FB.api('/me', function(response) {
-            var userId = response['id'];
+            userId = response['id'];
             resolve(userId);
           });
       })
@@ -78,7 +78,10 @@ function getPhotos(response) {
                             }
                             person_ids[name] = data['id'];
                             persons.push(name);
-                            communities[photo.id].push(persons.indexOf(name));
+
+                            if (userId !== data['id']) {
+                                communities[photo.id].push(persons.indexOf(name));
+                            }
 
                         }
 

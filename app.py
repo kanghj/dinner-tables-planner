@@ -164,7 +164,7 @@ def retrieve():
                 <p>{}</p>
                 <p>
                 If you are unable to access this page even
-                after waiting for about 6 hours,
+                after waiting for about 12 hours,
                 let us know!</p>
             </body>
             </html>
