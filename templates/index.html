@@ -102,7 +102,7 @@
                 <p>Hosting a dining event? Need to figure out who to seat each of your guests with? </p>
             </span>
             <span>
-                <p>We'll show you how best to seat your guests.</p>
+                <p>We'll help you creating a sitting arrangement.</p>
             </span>
 
             <div>
@@ -122,7 +122,7 @@
                     You will be given an option to indicate the nature of the relationship in the next step.
                 </p>
                 <p>
-                    If there are any guests who do not belong in any social group, also put them together under a column.
+                    For guests who do not belong in any social group, also put them together under a column and name it "Uncategorized".
                 </p>
 
                 <img src="static/example.PNG">
@@ -143,7 +143,7 @@
                     <label for="file-upload">Guest List (.csv or .xlsx)</label>
                     <input id="file-upload" type="file" name="file">
                     <label for="table-size">Seats per table</label>
-                    <input id="table-size" type="number" name="size"
+                    <input id="table-size" type="number" name="size" value="10"
                             placeholder="10">
                     <input id="facebook_access_token" name="facebook_access_token" type="hidden">
                     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">

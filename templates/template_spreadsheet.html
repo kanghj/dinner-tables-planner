@@ -113,7 +113,7 @@
               if (alreadyRetrieved != null && alreadyRetrieved) {
                 return;
               }
-              alreadyRetrieved = true;
+
               FB.getLoginStatus(function(response){
               // TODO check if login already
                 if (response.status === 'connected') {
@@ -137,6 +137,9 @@
             var photoIds = []
             for (value of values) {
                 photoIds.push($(value).data('photo-id'));
+            }
+            if (photoIds.length > 0) {
+                alreadyRetrieved = true;
             }
             photoIds = new Set(photoIds);
             for (photoId of photoIds) {
