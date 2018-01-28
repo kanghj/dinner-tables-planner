@@ -102,7 +102,7 @@
                 <p>Hosting a dining event? Need to figure out who to seat each of your guests with? </p>
             </span>
             <span>
-                <p>We'll show you how best to seat your guests.</p>
+                <p>We'll help you creating a sitting arrangement.</p>
             </span>
 
             <div>
@@ -110,17 +110,25 @@
 
                 <p>
                     <a href="/from_photos">You can allow us to initialise a guest list</a> based on who appears in your Facebook photos.
-                    Afterwards, modify the guest list through Microsoft Excel or LibreOffice and submit it on this page.
+                    Afterwards, modify the guest list through Microsoft Excel (or LibreOffice) and submit it on this page.
                 </p>
                 <p>
-                    In this Excel spreadsheet, your guests should be listed and organised based on who knows each other.
+                    In this Excel spreadsheet, your guests should primarily be organised based on who knows each other.
                     Name the groups through the header of each column.
+                </p>
+
+                <p>
+                    Do the same for unfriendly relationships: create a column with guests who should not sit with each other.
+                    You will be given an option to indicate the nature of the relationship in the next step.
+                </p>
+                <p>
+                    For guests who do not belong in any social group, also put them together under a column and name it "Uncategorized".
                 </p>
 
                 <img src="static/example.PNG">
 
                 <p>
-                    Individuals are allowed to be listed in multiple groups/columns.
+                    Individuals should be listed in multiple groups/columns.
                     E.g. "Hercule Poirot" is a classmate to both the groom and bride, hence he is listed in both groups of friends.
                 </p>
 
@@ -135,7 +143,7 @@
                     <label for="file-upload">Guest List (.csv or .xlsx)</label>
                     <input id="file-upload" type="file" name="file">
                     <label for="table-size">Seats per table</label>
-                    <input id="table-size" type="number" name="size"
+                    <input id="table-size" type="number" name="size" value="10"
                             placeholder="10">
                     <input id="facebook_access_token" name="facebook_access_token" type="hidden">
                     <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
