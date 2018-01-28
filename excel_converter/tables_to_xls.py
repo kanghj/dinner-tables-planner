@@ -20,7 +20,7 @@ def make_workbook(persons, communities):
         column_name = column_names[i]
         ws[column_name + '1'] = 'Table ' + str(table_name)
         for j, member in enumerate(members):
-            ws[column_name + str(j + starting_col)] = persons[int(member) - 1]
+            ws[column_name + str(j + starting_col)] = persons[int(member) - 1].lstrip('=')
 
     return io.BytesIO(save_virtual_workbook(wb))
 
