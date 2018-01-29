@@ -243,7 +243,7 @@ class SolverTest(TestCase):
         }
         persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
         assert len(persons) == 11
-        tables, persons = partition(community, str(uuid.uuid4()), persons, 3, {0: 1, 1: 1, 2:1})
+        tables, persons, is_final = partition(community, str(uuid.uuid4()), persons, 3, {0: 1, 1: 1, 2:1})
 
         resulting_groups = [values for values in tables.values()]
         print(resulting_groups)
@@ -262,7 +262,7 @@ class SolverTest(TestCase):
         }
         persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
         assert len(persons) == 11
-        tables, persons = partition(community, str(uuid.uuid4()), persons, 3, {0: 1, 1: 1, 2:1})
+        tables, persons, is_final = partition(community, str(uuid.uuid4()), persons, 3, {0: 1, 1: 1, 2:1})
 
         resulting_groups = [sorted(values) for values in tables.values()]
         print(resulting_groups)
@@ -282,7 +282,9 @@ class SolverTest(TestCase):
         }
         persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         assert len(persons) == 10
-        tables, persons = partition(community, str(uuid.uuid4()), persons, 5, {0: 1, 1: 1, 2:0})
+        tables, persons, is_final = partition(community, str(uuid.uuid4()), persons, 5, {0: 1, 1: 1, 2:0})
+
+        self.assertTrue(is_final)
 
         resulting_groups = [sorted(values) for values in tables.values()]
 
@@ -299,9 +301,11 @@ class SolverTest(TestCase):
         }
         persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         assert len(persons) == 8
-        tables, persons = partition(community, str(uuid.uuid4()), persons, 4, {0: 1, 1: 1, 2:0})
+        tables, persons, is_final = partition(community, str(uuid.uuid4()), persons, 4, {0: 1, 1: 1, 2:0})
 
         resulting_groups = [sorted(values) for values in tables.values()]
+
+        self.assertTrue(is_final)
 
         print(resulting_groups)
         # these are not the only right answers, there can be other right ones
