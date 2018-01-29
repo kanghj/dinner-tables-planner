@@ -120,21 +120,21 @@ def solve():
     <body>
         <article>
         <p>
-        Your token is <strong>{}</strong>. If you were not logged-in to Facebook when submitting the guest list, please copy and paste it somewhere for retrieving the seating chart in future.
+        Your token is <strong>{}</strong>. If you were not logged in to Facebook when submitting the guest list, please copy and paste it somewhere for retrieving the seating chart in future.
         </p>
         <p>
         We will need some time to process your guest list and plan the sitting arrangement for your seating chart.
         </p>
         <p>
         Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after ~{}
-        hours to collect our proposed seating plan to your event.
+        minutes to view a preview of the seating chart. The seating chart will be finalised in half a day.
         </p>
         </article>
         <a href="/">Back to Home</a>
     </body>
     """
     return app.response_class(
-        response=page_html.format(job_id, job_id, '5'),
+        response=page_html.format(job_id, job_id, '10'),
         status=200,
         mimetype='text/html'
     )
@@ -164,7 +164,7 @@ def retrieve():
                 <p>{}</p>
                 <p>
                 If you are unable to access this page even
-                after waiting for about 12 hours,
+                after waiting for about 2 hours,
                 let us know!</p>
             </body>
             </html>

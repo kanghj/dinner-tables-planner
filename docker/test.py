@@ -46,7 +46,7 @@ def stream_output(atoms, path_to_file):
 
 async def update_s3(path_to_file):
     while not job_done:
-        await asyncio.sleep(5)
+        await asyncio.sleep(60)
         ans_bucket = 'dining-tables-solved'
         filename = path_to_file.split('/')[-1]
         ans_key = urllib.parse.unquote_plus(filename + '.ans', encoding='utf-8')
@@ -59,6 +59,7 @@ async def update_s3(path_to_file):
             print('Cannot write to s3')
 
             raise e
+        await asyncio.sleep(2640) # 44 minutes
 
 
 def get_file_and_solve():
