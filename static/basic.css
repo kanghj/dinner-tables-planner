@@ -49,3 +49,7 @@
 #image-dialog {
     position:absolute;
 }
+
+.is-final-False {
+    color: grey;
+}

@@ -1,11 +1,10 @@
-
-import json
 import subprocess
 import urllib.parse
 import boto3
-import shutil
 import os
 import sys
+import asyncio
+
 
 # os.environ['PATH'] = os.environ['PATH'] + ':' + os.environ['LAMBDA_TASK_ROOT']
 
@@ -13,15 +12,54 @@ print('Loading function')
 
 s3 = boto3.client('s3')
 
-def solve_by_clingo(atoms):
+job_done = False
+
+async def solve_by_clingo(atoms):
+    global job_done
+    print('Going to start clingo')
+
     clingo_path = '/usr/local/bin/clingo-5.2.2-linux-x86_64/clingo'
     os.chmod(clingo_path, 0o555)
 
-    proc = subprocess.Popen([clingo_path, '-t 8',
-                             '--time-limit=36000'],
-                            stdout=subprocess.PIPE,  stdin=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
+    with open('input.txt', 'w+') as infile:
+        infile.write(atoms)
 
-    return proc.communicate(input = atoms)
+    proc = await asyncio.create_subprocess_exec(clingo_path, '-t 8',
+                             '--time-limit=36000',
+                            stdout=open('output.txt', 'w+'), stdin=open('input.txt', 'r'), stderr=subprocess.PIPE, encoding='utf8')
+    returncode = await proc.wait()
+    print('clingo is done')
+
+    job_done = True
+
+
+
+def stream_output(atoms, path_to_file):
+    loop = asyncio.get_event_loop()
+    tasks = [
+        asyncio.ensure_future(solve_by_clingo(atoms)),
+        asyncio.ensure_future(update_s3(path_to_file)),
+        ]
+    loop.run_until_complete(asyncio.gather(*tasks))
+    loop.close()
+
+
+async def update_s3(path_to_file):
+    while not job_done:
+        await asyncio.sleep(60)
+        ans_bucket = 'dining-tables-solved'
+        filename = path_to_file.split('/')[-1]
+        ans_key = urllib.parse.unquote_plus(filename + '.ans', encoding='utf-8')
+        try:
+            with open('output.txt') as infile:
+                body = infile.read()
+            s3.put_object(Bucket=ans_bucket, Key=ans_key, Body=body)
+        except Exception as e:
+            print(e)
+            print('Cannot write to s3')
+
+            raise e
+        await asyncio.sleep(2640) # 44 minutes
 
 
 def get_file_and_solve():
@@ -47,15 +85,16 @@ def get_file_and_solve():
     print('Atoms')
     print(atoms)
 
-    ans, stderr = solve_by_clingo(atoms)
-    if stderr is not None:
-        print(stderr)
+    stream_output(atoms, path_to_file)
 
+    # final write
     ans_bucket = 'dining-tables-solved'
     filename = path_to_file.split('/')[-1]
     ans_key = urllib.parse.unquote_plus(filename + '.ans', encoding='utf-8')
     try:
-        s3.put_object(Bucket=ans_bucket, Key=ans_key, Body=ans)
+        with open('output.txt') as infile:
+            body = infile.read()
+        s3.put_object(Bucket=ans_bucket, Key=ans_key, Body=body)
     except Exception as e:
         print(e)
         print('Cannot write file')

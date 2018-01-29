@@ -120,21 +120,21 @@ def solve():
     <body>
         <article>
         <p>
-        Your token is <strong>{}</strong>. If you were not logged-in to Facebook when submitting the guest list, please copy and paste it somewhere for retrieving the seating chart in future.
+        Your token is <strong>{}</strong>. If you were not logged in to Facebook when submitting the guest list, please copy and paste it somewhere for retrieving the seating chart in future.
         </p>
         <p>
         We will need some time to process your guest list and plan the sitting arrangement for your seating chart.
         </p>
         <p>
         Visit <a href="retrieve?job_id={}&from_submit_page=true">this page</a> after ~{}
-        hours to collect our proposed seating plan to your event.
+        minutes to view a preview of the seating chart. The seating chart will be finalised in half a day.
         </p>
         </article>
         <a href="/">Back to Home</a>
     </body>
     """
     return app.response_class(
-        response=page_html.format(job_id, job_id, '5'),
+        response=page_html.format(job_id, job_id, '10'),
         status=200,
         mimetype='text/html'
     )
@@ -143,7 +143,7 @@ def solve():
 @app.route('/retrieve', methods=['GET'])
 def retrieve():
     job_id = request.args.get('job_id').strip()
-    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original, new_community, clique_names, is_final = ans_from_s3_ans_bucket(job_id)
     if tables is None:
         from_submit_page = request.args.get('from_submit_page')
         return app.response_class(
@@ -164,7 +164,7 @@ def retrieve():
                 <p>{}</p>
                 <p>
                 If you are unable to access this page even
-                after waiting for about 12 hours,
+                after waiting for about 2 hours,
                 let us know!</p>
             </body>
             </html>
@@ -178,8 +178,9 @@ def retrieve():
 
     return render_template('retrieve.html',
                            result={
-                            'table' : table_html,
-                            'job_id' : job_id
+                            'table': table_html,
+                            'job_id': job_id,
+                            'is_final': is_final
                            })
 
 
@@ -245,7 +246,7 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
 @app.route('/retrieve_as_xlsx', methods=['POST'])
 def retrieve_as_excel():
     job_id = request.form['job_id']
-    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original, new_community, clique_names, is_final = ans_from_s3_ans_bucket(job_id)
     bytes_xlsx = make_workbook(persons, tables)
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",
