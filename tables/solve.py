@@ -296,7 +296,7 @@ def ans_from_s3_ans_bucket(job_id):
             Key='{}.lp.ans'.format(job_id))['Body'].read().decode('utf-8')
     except ClientError as ex:
         if ex.response['Error']['Code'] == 'NoSuchKey':
-            return None, None, None, None, None
+            return None, None, None, None, None, None
 
     persons, coarse_to_original, clique_names, new_community = json.loads(
         s3.get_object(
