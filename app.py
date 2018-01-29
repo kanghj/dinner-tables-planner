@@ -178,8 +178,9 @@ def retrieve():
 
     return render_template('retrieve.html',
                            result={
-                            'table' : table_html,
-                            'job_id' : job_id
+                            'table': table_html,
+                            'job_id': job_id,
+                            'is_final': is_final
                            })
 
 

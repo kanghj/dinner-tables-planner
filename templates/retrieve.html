@@ -16,8 +16,15 @@
     <div>
         <h1>Seating Chart</h1>
     </div>
-    <article>
+    {% if not result.is_final %}
+        <p>
+            <code>PREVIEW</code>
+            <small>(There may still be changes to this plan in the next couple of hours)</small>
+        </p>
+    {% endif %}
+    <article class="is-final-{{result.is_final}}">
         <h2>Seating Chart</h2>
+
         <label class="right">
             <input type="checkbox" name="see-original-clique-names" id="see-original-clique-names">
             Label each person with original groups
@@ -25,8 +32,9 @@
         {{ result.table | safe}}
     </article>
 
-    <article class="below-results">
 
+    <article class="below-results">
+        {% if result.is_final %}
         <p>This proposed seating plan will be available at this url for about 2 weeks.</p>
         <p>You can download this seating plan (viewable with Excel).</p>
         <form class="download" method="POST" action="retrieve_as_xlsx">
@@ -43,6 +51,7 @@
                 <input type="submit" value="Delete" class="red">
             </fieldset>
         </form>
+        {% endif%}
     </article>
 
     <a href="/">Back to Home</a>

@@ -255,9 +255,11 @@ def create_file_and_upload_to_s3(job_id, clique_weights_raw):
 
 
 def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
-    resp_text = [resp_text_line.strip() for resp_text_line in resp_text]
+    # resp_text = [resp_text_line.strip() for resp_text_line in resp_text]
+
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
+    is_final = False
     for table_num, nodes in coarse_tables.items():
         original_persons = []
         for node in nodes:
@@ -268,7 +270,7 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
         tables[table_num] = original_persons
 
         is_final = 'OPTIMUM FOUND' in resp_text
-        print(resp_text)
+
     return tables, is_final
 
 
