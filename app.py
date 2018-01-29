@@ -160,8 +160,7 @@ def retrieve():
             <body>
                 <h1>Oops, we need more time</h1>
                 <p>Sorry, but we are not ready with
-                    your seating plan yet.</p>
-                <p>Please come back later.</p>
+                    your seating plan yet. Please come back later.</p>
                 <p>{}</p>
                 <p>
                 If you are unable to access this page even
@@ -187,11 +186,11 @@ def retrieve():
                     </head>
                     <body>
                         <h1>Unable to produce a chart</h1>
-                        <p>Sorry, but there may be some temporarily error.</p>
-                        <p>Please come back later.</p>
+                        <p>Sorry, but there are some temporarily errors.</p>
+                        <p>Please try again later.</p>
                         <p>
                         If you are unable to access this page even
-                        after waiting for about 10 minutes
+                        after waiting for over 30 minutes,
                         let us know!</p>
                     </body>
                     </html>
