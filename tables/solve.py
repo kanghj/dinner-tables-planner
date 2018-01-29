@@ -10,7 +10,6 @@ import json
 
 import math
 
-import sys
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
 from openpyxl import load_workbook
@@ -283,7 +282,8 @@ def partition(community, job_id, persons, table_size, clique_weights):
 
     resp_text = solve_by_clingo(facts, job_id)
 
-    tables, is_final = get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons)
+    tables, is_final = get_tables_from_clingo_out(
+        resp_text, coarse_nodes_to_persons)
     return tables, persons, is_final
 
 
