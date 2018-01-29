@@ -258,7 +258,6 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
 
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
-    is_final = False
     for table_num, nodes in coarse_tables.items():
         original_persons = []
         for node in nodes:
@@ -268,7 +267,10 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
                 original_persons.extend(coarse_nodes_to_persons[node])
         tables[table_num] = original_persons
 
-        is_final = 'OPTIMUM FOUND' in resp_text
+    is_final = 'OPTIMUM FOUND' in resp_text \
+        if isinstance(resp_text, str) \
+        else 'OPTIMUM FOUND' in \
+        [resp_text_value.strip() for resp_text_value in resp_text]
 
     return tables, is_final
 
