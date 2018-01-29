@@ -145,6 +145,7 @@ def retrieve():
     job_id = request.args.get('job_id').strip()
     tables, persons, coarse_to_original, new_community, clique_names, is_final = ans_from_s3_ans_bucket(job_id)
     if tables is None:
+        # no results yet
         from_submit_page = request.args.get('from_submit_page')
         return app.response_class(
             response="""
@@ -172,6 +173,31 @@ def retrieve():
             status=503,
             mimetype='text/html'
         )
+    if len(tables) == 0:
+        # results is somehow empty...
+        return app.response_class(
+            response="""
+                    <!doctype html>
+                    <html>
+                    <head>
+                        <title>Seating Chart Plan - Unable to create seating chart</title>
+                        <link rel="stylesheet"
+                    href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+                    <link rel="shortcut icon" href="static/favicon.ico">
+                    </head>
+                    <body>
+                        <h1>Unable to produce a chart</h1>
+                        <p>Sorry, but there may be some temporarily error.</p>
+                        <p>Please come back later.</p>
+                        <p>
+                        If you are unable to access this page even
+                        after waiting for about 10 minutes
+                        let us know!</p>
+                    </body>
+                    </html>
+                    """,
+            status=503,
+            mimetype='text/html')
     table_size = max([len(seats) for seats in tables.values()])
 
     table_html = convert_tables_html(table_size, persons, tables, coarse_to_original, new_community, clique_names)
