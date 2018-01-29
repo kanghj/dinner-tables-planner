@@ -143,7 +143,7 @@ def solve():
 @app.route('/retrieve', methods=['GET'])
 def retrieve():
     job_id = request.args.get('job_id').strip()
-    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original, new_community, clique_names, is_final = ans_from_s3_ans_bucket(job_id)
     if tables is None:
         from_submit_page = request.args.get('from_submit_page')
         return app.response_class(
@@ -178,8 +178,9 @@ def retrieve():
 
     return render_template('retrieve.html',
                            result={
-                            'table' : table_html,
-                            'job_id' : job_id
+                            'table': table_html,
+                            'job_id': job_id,
+                            'is_final': is_final
                            })
 
 
@@ -245,7 +246,7 @@ def convert_tables_html(table_size, persons, tables, coarse_to_original, new_com
 @app.route('/retrieve_as_xlsx', methods=['POST'])
 def retrieve_as_excel():
     job_id = request.form['job_id']
-    tables, persons, coarse_to_original, new_community, clique_names = ans_from_s3_ans_bucket(job_id)
+    tables, persons, coarse_to_original, new_community, clique_names, is_final = ans_from_s3_ans_bucket(job_id)
     bytes_xlsx = make_workbook(persons, tables)
 
     return send_file(bytes_xlsx, attachment_filename="seating_plan.xlsx",

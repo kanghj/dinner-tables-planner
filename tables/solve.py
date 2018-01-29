@@ -254,6 +254,8 @@ def create_file_and_upload_to_s3(job_id, clique_weights_raw):
 
 
 def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
+    # resp_text = [resp_text_line.strip() for resp_text_line in resp_text]
+
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
     for table_num, nodes in coarse_tables.items():
@@ -264,7 +266,13 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
             except KeyError as e:
                 original_persons.extend(coarse_nodes_to_persons[node])
         tables[table_num] = original_persons
-    return tables
+
+    is_final = 'OPTIMUM FOUND' in resp_text \
+        if isinstance(resp_text, str) \
+        else 'OPTIMUM FOUND' in \
+        [resp_text_value.strip() for resp_text_value in resp_text]
+
+    return tables, is_final
 
 
 def partition(community, job_id, persons, table_size, clique_weights):
@@ -276,8 +284,9 @@ def partition(community, job_id, persons, table_size, clique_weights):
 
     resp_text = solve_by_clingo(facts, job_id)
 
-    return get_tables_from_clingo_out(
-        resp_text, coarse_nodes_to_persons), persons
+    tables, is_final = get_tables_from_clingo_out(
+        resp_text, coarse_nodes_to_persons)
+    return tables, persons, is_final
 
 
 def ans_from_s3_ans_bucket(job_id):
@@ -294,8 +303,9 @@ def ans_from_s3_ans_bucket(job_id):
             Bucket='dining-tables-solved',
             Key='pickles/{}'.format(job_id))['Body'].read().decode('utf-8'))
 
-    return get_tables_from_clingo_out(readfile, coarse_to_original), \
-        persons, coarse_to_original, new_community, clique_names
+    tables, is_final = get_tables_from_clingo_out(readfile, coarse_to_original)
+    return tables, \
+        persons, coarse_to_original, new_community, clique_names, is_final
 
 
 def delete_job(job_id):
