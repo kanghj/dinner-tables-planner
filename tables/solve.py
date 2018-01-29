@@ -10,6 +10,7 @@ import json
 
 import math
 
+import sys
 from werkzeug.utils import secure_filename
 from botocore.exceptions import ClientError
 from openpyxl import load_workbook
@@ -254,6 +255,7 @@ def create_file_and_upload_to_s3(job_id, clique_weights_raw):
 
 
 def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
+
     coarse_tables = parse_clingo_out(resp_text)
     tables = {}
     for table_num, nodes in coarse_tables.items():
