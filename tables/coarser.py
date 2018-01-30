@@ -55,7 +55,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     for clique_name, members in community.items():
         for member in members:
             cliques_of_person[member].append(clique_name)
-        if clique_weights[clique_name] == 0:
+        if clique_weights[clique_name] <= 0:
+            # prevent persons with only zero or negative to be coarsened
             continue
         for member1, member2 in itertools.product(members, members):
             # if member1 != member2:
@@ -85,6 +86,22 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
                   for i in range(0, len(coupled_people), table_size)]
         for chunk in chunks:
 
+            # test eligibility of `chunk`
+            # a `chunk` is not eligible to be grouped into a single coarse node
+            # if it causes only a single remaining member in the community
+            is_eligible = True
+            for clique in cliques:
+                if len(community[clique]) - len(chunk) == 1:
+                    is_eligible = False
+
+            if not is_eligible:
+                # on fail, update node_to_persons and new_community
+                node_to_persons[person] = [person]
+
+                for clique in cliques:
+                    new_community[clique].append(person)
+                continue
+
             for clique in cliques:
                 if chunk in grouped_clique_members[clique]:
                     continue
@@ -99,7 +116,7 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             node_to_persons[clique_rep] = members
             new_community[clique].append(clique_rep)
 
-            if clique_weights[clique] != 0:
+            if clique_weights[clique] > 0:
                 presolved_facts.append(
                     ('can_violate_isolation_rule', clique_rep, ))
             # if clique_rep in clique_rep_already_in_table:

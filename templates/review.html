@@ -28,13 +28,22 @@
             <input type="hidden" name="job_id" value="{{job_id}}">
 
             <h3>How important is it that people within each group sit together?</h3>
-            <small>Give '0' if the people within a group do not need to sit together at all</small>
-            <small>Give '-1' if its the people within a group SHOULD NOT sit together</small>
+
             <fieldset>
                 <input type="hidden" name="num_cliques" value="{{clique_names|length}}">
                 {% for clique_name in clique_names %}
                     <label>{{clique_name}}</label>
-                    <input name="{{loop.index}}_weight" type="number" value="1">
+
+                    <div>
+                        <select name="{{loop.index}}_weight">
+                            <option value="2">Important that they</option>
+                            <option value="1" selected>Should </option>
+                            <option value="0">Indifferent as to whether or not </option>
+                            <option value="-1">Should NOT </option>
+                            <option value="-2">Important NOT to</option>
+                        </select>
+                        <span>sit together</span>
+                    </div>
                     <input class="hide" type="checkbox" name="{{loop.index}}_clique_name" value="{{clique_name}}" checked>
                 {% endfor %}
                 <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
