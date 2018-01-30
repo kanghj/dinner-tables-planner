@@ -53,3 +53,4 @@ violations(V) :- V = #count{ C : violates_isolation_rule(A), in_clique(A, C), N 
 #show person_size/2.
 %%#show in_clique/2.
 #show clique_size/2.
+#show in_clique/2.

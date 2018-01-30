@@ -55,7 +55,7 @@ def represent_in_asp(coarse_to_original, new_community,
         if clique_weight_fact not in facts:
             facts.append(clique_weight_fact)
         clique_size_fact = 'clique_size({}, {}).'.format(
-            clique_number, len(members))
+            clique_number, len(set(members)))
         if clique_size_fact not in facts:
             facts.append(clique_size_fact)
 
@@ -273,10 +273,10 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
                 original_persons.extend(coarse_nodes_to_persons[node])
         tables[table_num] = original_persons
 
-    is_final = ('OPTIMUM FOUND' in resp_text
+    is_final = ('SATISFIABLE' in resp_text
                 or 'UNSATISFIABLE' in resp_text) \
         if isinstance(resp_text, str) \
-        else 'OPTIMUM FOUND' in \
+        else 'SATISFIABLE' in \
         [resp_text_value.strip() for resp_text_value in resp_text]
 
     return tables, is_final
