@@ -273,13 +273,17 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
                 original_persons.extend(coarse_nodes_to_persons[node])
         tables[table_num] = original_persons
 
-    is_final = ('SATISFIABLE' in resp_text
-                or 'UNSATISFIABLE' in resp_text) \
-        if isinstance(resp_text, str) \
-        else 'SATISFIABLE' in \
-        [resp_text_value.strip() for resp_text_value in resp_text]
+    is_final = is_final_text(resp_text)
 
     return tables, is_final
+
+
+def is_final_text(resp_text):
+    text = resp_text if isinstance(resp_text, str) \
+        else ' '.join(resp_text)
+
+    return 'SATISFIABLE' in text or 'UNSATISFIABLE' in text \
+           or 'OPTIMUM FOUND' in text
 
 
 def partition(community, job_id, persons, table_size, clique_weights):
