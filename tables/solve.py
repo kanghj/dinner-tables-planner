@@ -175,7 +175,7 @@ def get_clingo_output(facts_file):
     resp_text = []
     for line in proc.stdout:
         resp_text.append(line.decode('utf-8'))
-    print(resp_text)
+
     return resp_text
 
 
@@ -288,7 +288,6 @@ def partition(community, job_id, persons, table_size, clique_weights):
     facts, persons, coarse_nodes_to_persons = represent_in_asp(
         coarse_to_original, new_community, new_table_sz,
         persons, presolved, clique_weights, table_size)
-    print(facts)
 
     resp_text = solve_by_clingo(facts, job_id)
 
