@@ -289,8 +289,8 @@ class SolverTest(TestCase):
         resulting_groups = [sorted(values) for values in tables.values()]
 
         # these are not the only right answers, there can be other right ones
-        self.assertTrue([0, 1, 2, 6, 7] in resulting_groups)
-        self.assertTrue([3, 4, 5, 8, 9] in resulting_groups)
+        self.assertTrue([0, 1, 2, 6, 7] in resulting_groups or [0, 1, 2, 8, 9] in resulting_groups)
+        self.assertTrue([3, 4, 5, 8, 9] in resulting_groups or [3, 4, 5, 6, 7] in resulting_groups)
 
     def test_partition_with_one_column_of_clique_weight_zero_can_be_isolated(self):
 
@@ -309,8 +309,8 @@ class SolverTest(TestCase):
 
         print(resulting_groups)
         # these are not the only right answers, there can be other right ones
-        self.assertTrue([0, 1, 2, 7] in resulting_groups)
-        self.assertTrue([3, 4, 5, 6] in resulting_groups)
+        self.assertTrue([0, 1, 2, 7] in resulting_groups or [0, 1, 2, 6] in resulting_groups)
+        self.assertTrue([3, 4, 5, 6] in resulting_groups or [3, 4, 5, 7] in resulting_groups)
 
 
     def test_partition_with_negative_edge_weights(self):
