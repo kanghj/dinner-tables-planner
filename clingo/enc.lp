@@ -37,8 +37,10 @@ violates_isolation_rule(A) :- can_violate_isolation_rule(A), #sum {PS, B : perso
 
 clique_size(C, N) :- clique(C), N = #sum { W, A: person_size(A, W), in_clique(A, C)}.
 
-has_violation(C) :- violates_isolation_rule(A), in_clique(A, C), N > S, clique_size(C, N), minimum_isolation_size(S).
-:- has_violation(_).
+violations(V) :- V = #count{ C : violates_isolation_rule(A), in_clique(A, C), N > S, clique_size(C, N), minimum_isolation_size(S)}.
+%% :- has_violation(_).
+
+#minimize {  C@3 : violations(C) }.
 
 #show in_table/2.
 
@@ -47,7 +49,6 @@ has_violation(C) :- violates_isolation_rule(A), in_clique(A, C), N > S, clique_s
 #show clique_weight/2.
 %% #show cut/2.
 #show violates_isolation_rule/1.
-#show has_violation/1.
 
 #show person_size/2.
 %%#show in_clique/2.
