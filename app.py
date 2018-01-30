@@ -172,7 +172,7 @@ def retrieve():
             status=503,
             mimetype='text/html'
         )
-    if len(tables) == 0:
+    if len(tables) == 0 and not is_final:
         # results is somehow empty...
         return app.response_class(
             response="""
@@ -195,6 +195,30 @@ def retrieve():
                     </body>
                     </html>
                     """,
+            status=503,
+            mimetype='text/html')
+    elif len(tables) == 0 and is_final:
+        # Unsatisfiable
+        return app.response_class(
+            response="""
+                            <!doctype html>
+                            <html>
+                            <head>
+                                <title>Seating Chart Plan - Unable to create seating chart</title>
+                                <link rel="stylesheet"
+                            href="//cdn.rawgit.com/yegor256/tacit/gh-pages/tacit-css-1.1.1.min.css"/>
+                            <link rel="shortcut icon" href="static/favicon.ico">
+                            </head>
+                            <body>
+                                <h1>Unable to produce a chart</h1>
+                              
+                                <p>We are unable to find a solution</p>
+                                <p>
+                                Try changing table size.
+                                If that does not work, please contact us!</p>
+                            </body>
+                            </html>
+                            """,
             status=503,
             mimetype='text/html')
     table_size = max([len(seats) for seats in tables.values()])

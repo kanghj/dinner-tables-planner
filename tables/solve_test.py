@@ -311,3 +311,24 @@ class SolverTest(TestCase):
         # these are not the only right answers, there can be other right ones
         self.assertTrue([0, 1, 2, 7] in resulting_groups)
         self.assertTrue([3, 4, 5, 6] in resulting_groups)
+
+
+    def test_partition_with_negative_edge_weights(self):
+
+        community = {
+            0: [0, 1, 2],
+            1: [3, 4, 5],
+            2: [6, 7]
+        }
+        persons = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        assert len(persons) == 8
+        tables, persons, is_final = partition(community, str(uuid.uuid4()), persons, 5, {0: 1, 1: 1, 2:-1})
+
+        resulting_groups = [sorted(values) for values in tables.values()]
+
+        self.assertTrue(is_final)
+
+        print(resulting_groups)
+        # these are not the only right answers, there can be other right ones
+        self.assertTrue([0, 1, 2, 7] in resulting_groups)
+        self.assertTrue([3, 4, 5, 6] in resulting_groups)

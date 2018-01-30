@@ -55,7 +55,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     for clique_name, members in community.items():
         for member in members:
             cliques_of_person[member].append(clique_name)
-        if clique_weights[clique_name] == 0:
+        if clique_weights[clique_name] <= 0:
+            # prevent persons with only zero or negative to be coarsened
             continue
         for member1, member2 in itertools.product(members, members):
             # if member1 != member2:
