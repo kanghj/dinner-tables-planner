@@ -113,8 +113,8 @@ def community_and_persons_from_file(path, filetype):
                     col_name = cell.value
                     if col_name is None or \
                             (isinstance(col_name, str) and
-                                     len(col_name) == 0):
-                        break # skip empty columns
+                                len(col_name) == 0):
+                        break  # skip empty columns
 
                     clique_names.append(col_name)
                     continue

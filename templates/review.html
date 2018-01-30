@@ -35,14 +35,15 @@
                     <label>{{clique_name}}</label>
 
                     <select name="{{loop.index}}_weight">
-                        <option value="10">Very important that that they sit together</option>
-                        <option value="2">Important that they sit together</option>
-                        <option value="1" selected>Should sit together</option>
-                        <option value="0">Indifferent to whether they sit together or not</option>
-                        <option value="-1">Should NOT sit together</option>
-                        <option value="-5">Important that they do NOT sit together</option>
-                        <option value="-10">Very Important that they do NOT sit together</option>
+                        <option value="10">Very important </option>
+                        <option value="2">Important </option>
+                        <option value="1" selected>Should </option>
+                        <option value="0">Indifferent as to whether or not </option>
+                        <option value="-1">Should NOT </option>
+                        <option value="-5">Important not NOT </option>
+                        <option value="-10">Very Important NOT</option>
                     </select>
+                    to sit together
                     <input class="hide" type="checkbox" name="{{loop.index}}_clique_name" value="{{clique_name}}" checked>
                 {% endfor %}
                 <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
