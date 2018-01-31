@@ -77,11 +77,19 @@ def review():
 
     job_id, community, persons, clique_names = create_staging_file_and_upload_to_s3(table_size, file)
 
+    # validate and sanitize names
+    persons_contain_formulas = any(['=' in person for person in persons])
+    cliques_contain_formulas = any(['=' in clique_name for clique_name in clique_names])
+
+    warning_message = '' if not cliques_contain_formulas and not persons_contain_formulas else \
+        'Warning! Your guest contains some Excel Formulas! We do not evaluate formulas and remove them from the data'
+
     facebook_access_token = request.form['facebook_access_token']
     return render_template('review.html', job_id=job_id,
                            clique_names=[clique_name
                                          for clique_name in clique_names],
-                           facebook_access_token=facebook_access_token)
+                           facebook_access_token=facebook_access_token,
+                           warning_message=warning_message)
 
 
 @app.route('/solve', methods=['POST'])
