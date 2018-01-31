@@ -17,6 +17,10 @@
 
         <p>Please review some information by answering a few simple questions.</p>
 
+        {% if warning_message|length > 0 %}
+            <em>{{warning_message}}</em>
+        {% endif %}
+
         <div class="hide">
             <h3>Are these person names typos?</h3>
             <p>TODO</p>

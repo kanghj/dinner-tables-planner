@@ -18,7 +18,7 @@ def make_workbook(persons, communities):
     starting_col = 2
     for i, (table_name, members) in enumerate(communities.items()):
         column_name = column_names[i]
-        ws[column_name + '1'] = 'Table ' + str(table_name)
+        ws[column_name + '1'] = 'Table ' + str(table_name).lstrip('=')
         for j, member in enumerate(members):
             ws[column_name + str(j + starting_col)] = persons[int(member) - 1].lstrip('=')
 
