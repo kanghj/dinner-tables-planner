@@ -54,10 +54,6 @@ def represent_in_asp(coarse_to_original, new_community,
             clique_number, weight)
         if clique_weight_fact not in facts:
             facts.append(clique_weight_fact)
-        clique_size_fact = 'clique_size({}, {}).'.format(
-            clique_number, len(set(members)))
-        if clique_size_fact not in facts:
-            facts.append(clique_size_fact)
 
         for member in members:
             fact = 'in_clique({}, {}).'.format(
