@@ -78,6 +78,9 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
             for clique in cliques:
                 new_community[clique].append(person)
+            if clique_weights[clique_name] > 0:
+                presolved_facts.append(
+                    ('can_violate_isolation_rule', person,))
             # person cannot be combined with another to form a single node
             continue
 
@@ -100,6 +103,10 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
 
                 for clique in cliques:
                     new_community[clique].append(person)
+                if clique_weights[clique] > 0:
+                    presolved_facts.append(
+                        ('can_violate_isolation_rule', person,))
+
                 continue
 
             for clique in cliques:

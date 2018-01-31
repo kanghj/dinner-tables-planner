@@ -87,6 +87,8 @@ def community_and_persons_from_file(path, filetype):
             clique_names = []
             for row in reader:
                 for key, value in row.items():
+                    if len(key.strip()) == 0:
+                        continue
                     if key not in clique_names:
                         clique_names.append(key)
 
@@ -109,7 +111,7 @@ def community_and_persons_from_file(path, filetype):
                     col_name = cell.value
                     if col_name is None or \
                             (isinstance(col_name, str) and
-                                len(col_name) == 0):
+                                len(col_name.strip()) == 0):
                         break  # skip empty columns
 
                     clique_names.append(col_name)
