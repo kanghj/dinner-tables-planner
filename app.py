@@ -78,18 +78,27 @@ def review():
     job_id, community, persons, clique_names = create_staging_file_and_upload_to_s3(table_size, file)
 
     # validate and sanitize names
-    persons_contain_formulas = any(['=' in person for person in persons])
-    cliques_contain_formulas = any(['=' in clique_name for clique_name in clique_names])
+    persons_contain_formulas = any(['=' in str(person) for person in persons])
+    cliques_contain_formulas = any(['=' in str(clique_name) for clique_name in clique_names])
 
     warning_message = '' if not cliques_contain_formulas and not persons_contain_formulas else \
-        'Warning! Your guest contains some Excel Formulas! We do not evaluate formulas and remove them from the data'
+        'Your guest contains some Excel Formulas! We do not evaluate formulas and will remove them from your guest list.'
+
+    error_message = ''
+    # TODO measure
+    if len(persons) > 1000 or len(clique_names) > 100:
+        error_message += 'The size of the event is too big for us. Please review the information carefully and remove some people. ' \
+                         'You may benefit from hiring an event planner.'
+
+    warning_message = 'Warning!' + warning_message if len(warning_message) > 0 else ''
 
     facebook_access_token = request.form['facebook_access_token']
     return render_template('review.html', job_id=job_id,
                            clique_names=[clique_name
                                          for clique_name in clique_names],
                            facebook_access_token=facebook_access_token,
-                           warning_message=warning_message)
+                           warning_message=warning_message,
+                           error_message=error_message )
 
 
 @app.route('/solve', methods=['POST'])
@@ -222,7 +231,7 @@ def retrieve():
                               
                                 <p>We are unable to find a solution</p>
                                 <p>
-                                Try changing table size.
+                                Try changing the table size.
                                 If that does not work, please contact us!</p>
                             </body>
                             </html>
@@ -462,7 +471,7 @@ def four_zero_four(e):
 
 @app.errorhandler(500)
 def five_hundred(e):
-    return render_template('500.html'), 404
+    return render_template('500.html'), 500
 
 
 @app.before_request

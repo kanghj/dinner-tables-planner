@@ -125,7 +125,6 @@ def community_and_persons_from_file(path, filetype):
                 community[clique_names.index(col_name) + 1].append(
                     persons.index(cell.value) + 1)
 
-    assert len(clique_names) == len(set(clique_names))
     return community, persons, clique_names
 
 

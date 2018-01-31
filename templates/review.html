@@ -13,6 +13,11 @@
 <body>
 
     <article>
+        {% if error_message|length > 0 %}
+            <strong>{{error_message}}</strong>
+
+        {% else %}
+
         <h1>Review Information</h1>
 
         <p>Please review some information by answering a few simple questions.</p>
@@ -56,6 +61,8 @@
             </fieldset>
 
         </form>
+
+        {% endif %}
     </article>
 
     <footer>
