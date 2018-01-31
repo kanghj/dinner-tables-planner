@@ -54,10 +54,6 @@ def represent_in_asp(coarse_to_original, new_community,
             clique_number, weight)
         if clique_weight_fact not in facts:
             facts.append(clique_weight_fact)
-        clique_size_fact = 'clique_size({}, {}).'.format(
-            clique_number, len(members))
-        if clique_size_fact not in facts:
-            facts.append(clique_size_fact)
 
         for member in members:
             fact = 'in_clique({}, {}).'.format(
@@ -91,6 +87,8 @@ def community_and_persons_from_file(path, filetype):
             clique_names = []
             for row in reader:
                 for key, value in row.items():
+                    if len(key.strip()) == 0:
+                        continue
                     if key not in clique_names:
                         clique_names.append(key)
 
@@ -111,6 +109,11 @@ def community_and_persons_from_file(path, filetype):
             for j, cell in enumerate(column):
                 if j == 0:
                     col_name = cell.value
+                    if col_name is None or \
+                            (isinstance(col_name, str) and
+                                len(col_name.strip()) == 0):
+                        break  # skip empty columns
+
                     clique_names.append(col_name)
                     continue
                 if cell.value is None or \
@@ -164,12 +167,13 @@ def write_facts_to_file(facts, job_id):
 
 def get_clingo_output(facts_file):
     proc = subprocess.Popen(['exec/clingo', '-t 8',
-                             '--time-limit=25',
+                             '--time-limit=25', '--stat',
                              facts_file, 'clingo/enc.lp'],
                             stdout=subprocess.PIPE)
     resp_text = []
     for line in proc.stdout:
         resp_text.append(line.decode('utf-8'))
+
     return resp_text
 
 
@@ -267,12 +271,17 @@ def get_tables_from_clingo_out(resp_text, coarse_nodes_to_persons):
                 original_persons.extend(coarse_nodes_to_persons[node])
         tables[table_num] = original_persons
 
-    is_final = 'OPTIMUM FOUND' in resp_text \
-        if isinstance(resp_text, str) \
-        else 'OPTIMUM FOUND' in \
-        [resp_text_value.strip() for resp_text_value in resp_text]
+    is_final = is_final_text(resp_text)
 
     return tables, is_final
+
+
+def is_final_text(resp_text):
+    text = resp_text if isinstance(resp_text, str) \
+        else ' '.join(resp_text)
+
+    return 'SATISFIABLE' in text or 'UNSATISFIABLE' in text \
+           or 'OPTIMUM FOUND' in text
 
 
 def partition(community, job_id, persons, table_size, clique_weights):
