@@ -117,10 +117,10 @@ $(document).ready(function() {
         $('button')
         .attr('disabled', 'disabled')
         .attr('type', 'reset') // css hack to make button appear grey
-        .text('Building...');
+        .text('Gathering Information...');
 
-        setTimeout(5000, function() {
-            $('button').text('Still Building...')
-        });
+        setTimeout(function() {
+            $('button').text('Building...')
+        }, 1000);
     });
 });

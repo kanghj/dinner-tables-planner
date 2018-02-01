@@ -8,6 +8,7 @@ $(document).ready(function() {
     });
      $('#see-original-clique-names').click(function(event) {
         $('.community-tag').toggleClass('show');
+        $('#image-dialog').addClass('hide')
     });
 });
 

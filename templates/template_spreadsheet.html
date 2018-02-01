@@ -83,7 +83,12 @@
     </footer>
 
     <div id="image-dialog" class="hide">
-        <img id="image-on-hover" src="">
+        <article>
+            <p>This person appears in </p>
+            <img id="image-on-hover" src="">
+
+            <p><a id="fb-image-link" href="#">View on Facebook</a></p>
+        </article>
     </div>
 
     <script>
@@ -181,6 +186,8 @@
                 var image = fbPictureLinkOfImages[photoId];
 
                 $('#image-on-hover').attr('src', image);
+
+                $('#fb-image-link').attr('href', linksOfImages[photoId]);
 
             });
 
