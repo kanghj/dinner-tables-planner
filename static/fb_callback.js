@@ -121,6 +121,14 @@ $(document).ready(function() {
 
         setTimeout(function() {
             $('button').text('Building...')
-        }, 1000);
+        }, 1500);
+
+        setTimeout(function() {
+            $('button').text('Still Building...')
+        }, 5000);
+
+        setTimeout(function() {
+            $('button').text('Please wait a little longer...')
+        }, 10000);
     });
 });

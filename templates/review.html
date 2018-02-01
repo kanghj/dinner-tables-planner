@@ -41,7 +41,7 @@
             <fieldset>
                 <input type="hidden" name="num_cliques" value="{{clique_names|length}}">
                 {% for clique_name in clique_names %}
-                    <label>{{clique_name}}</label>
+                    <label class="clique_name" data-index="{{loop.index}}">{{clique_name}}</label>
 
                     <div>
                         <select name="{{loop.index}}_weight">
@@ -82,6 +82,22 @@
         </nav>
 
     </footer>
+
+    <script>
+        $('.clique_name').each(function(index, element) {
+            var index = $(element).data('index');
+            var $select = $('[name="' + index + '_weight"]');
+
+            if ($(element).text().includes('Should Not')) {
+                $select.val(-1);
+            }
+
+            if ($(element).text().includes('Uncategorized')) {
+                $select.val(0);
+            }
+        });
+
+    </script>
 
 </body>
 </html>
