@@ -109,17 +109,17 @@
                 <h3>1. Creating a Guest List</h3>
 
                 <p>
-                    <a href="/from_photos">You can allow us to initialise a guest list</a> based on who appears in your Facebook photos.
-                    Afterwards, modify the guest list through Microsoft Excel (or LibreOffice) and submit it on this page.
+                    <a href="/from_photos">You can allow us to initialise a guest list</a> from tagged friends in your Facebook photos.
                 </p>
                 <p>
-                    In this Excel spreadsheet, your guests should primarily be organised based on who knows each other.
-                    Name the groups through the header of each column.
+                    After that, edit the guest list through Microsoft Excel.
+                    Your guests should be organised based on what social groups they are part of.
+                    Name these groups on the header of each column.
                 </p>
 
                 <p>
-                    Do the same for unfriendly relationships: create a column with guests who should not sit with each other.
-                    You will be given an option to indicate the nature of the relationship in the next step.
+                    Do the same for unfriendly/antagonistic relationships: create a column with guests who should not sit in the same table.
+                    You can indicate the nature of the relationships in a later step.
                 </p>
                 <p>
                     For guests who do not belong in any social group, also put them together under a column and name it "Uncategorized".
@@ -128,8 +128,8 @@
                 <img src="static/example.PNG">
 
                 <p>
-                    Individuals should be listed in multiple groups/columns.
-                    E.g. "Hercule Poirot" is a classmate to both the groom and bride, hence he is listed in both groups of friends.
+                    Individuals should be listed in multiple groups/columns if they belong to more than one group.
+                    In the above example, Hercule Poirot is a classmate to both the groom and bride, hence he is listed in both groups of friends.
                 </p>
 
                 <div>Or download a template guest list <a href="static/example.xlsx">here</a> and complete it by hand.</div>
@@ -138,6 +138,12 @@
 
             <div>
                 <h3>2. Upload Guest List</h3>
+                <p>
+                    After you have completed the guest list either <a href="/from_photos">using your photos</a> or from our <a href="static/example.xlsx">template</a>,
+                    upload it in the form below.
+
+                </p>
+
                 <form method="post" enctype="multipart/form-data" action="review">
                 <fieldset>
                     <label for="file-upload">Guest List (.csv or .xlsx)</label>
@@ -155,7 +161,7 @@
             <div class="retrieve-results">
                 <h3>Retrieve Results</h3>
                 <p>
-                    If you logged in to Facebook before submitting your guest list, simply login again to retrieve your seating chart.
+                    If you were logged in to Facebook previously when submitting a guest list, login again to view your seating chart.
                     Otherwise, you can retrieve a seating plan with the token that was given to you.
                 </p>
 

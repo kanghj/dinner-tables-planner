@@ -18,7 +18,7 @@ function getPhotos(response) {
                 if (declined.length === 0)
                     resolve();
                 else
-                    reject();
+                    reject('Some permissions required for this feature to work has not been granted. If you do not wish to initialise a template using your Facebook information, please directly download our template from the home page');
             });
         });
       }).then(function() {
@@ -30,7 +30,7 @@ function getPhotos(response) {
 
     } else {
       // not logged in
-      document.getElementById('status').innerHTML = 'Please login to Facebook to use this feature. If you do not wish to initialise a template using your Facebook information, please directly download our template from the home page';
+      document.getElementById('status').innerHTML = 'Please login to Facebook to use this feature. If you do not wish to initialise a template using your Facebook information, please directly download our template from the home page.';
     }
     var accumulator = [];
     var userId;
@@ -117,6 +117,10 @@ $(document).ready(function() {
         $('button')
         .attr('disabled', 'disabled')
         .attr('type', 'reset') // css hack to make button appear grey
-        .val('Building...');
+        .text('Building...');
+
+        setTimeout(5000, function() {
+            $('button').text('Still Building...')
+        });
     });
 });

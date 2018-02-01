@@ -42,10 +42,15 @@
                 <input name=_csrf_token type=hidden value="{{ csrf_token() }}">
             </form>
 
-            <label class="right">
-                <input type="checkbox" name="see-original-clique-names" id="see-original-clique-names">
-                Show each person with photos they appear in (hover over the photo number to view the photo)
-            </label>
+            {% if communities|length != 0 %}
+                <label class="right">
+                    <input type="checkbox" name="see-original-clique-names" id="see-original-clique-names">
+                    Show each person with photos they appear in (hover over the photo number to view the photo)
+                </label>
+            {% else %}
+                <em>Unfortunately, we are not able to access any tagged person from your photos. Please use our <a href="static/example.xlsx">template</a> instead.</em>
+
+            {% endif%}
             <div id="contents">
 
             </div>
