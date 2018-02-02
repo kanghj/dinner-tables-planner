@@ -1,3 +1,5 @@
+var clearableCallbacks = [];
+
 function getPhotos(response) {
     if (response.status === 'connected') {
       new Promise(function(resolve, reject) {
@@ -26,6 +28,9 @@ function getPhotos(response) {
 
       }).catch(function(reason) {
         $('#status').text(reason);
+        for (callback of clearableCallbacks) {
+            clearTimeout(callback);
+        }
       });
 
     } else {
@@ -50,6 +55,9 @@ function getPhotos(response) {
                 if (!response.paging) {
                      if (accumulator.length === 0) {
                         document.getElementById('status').innerHTML = 'No publicly accessible photos were available. If you do not wish to initialise a template using your Facebook information, please directly download our template from the home page.';
+                        for (callback of clearableCallbacks) {
+                            clearTimeout(callback);
+                        }
                     }
                     return;
                 }
@@ -119,16 +127,16 @@ $(document).ready(function() {
         .attr('type', 'reset') // css hack to make button appear grey
         .text('Gathering Information...');
 
-        setTimeout(function() {
+        clearableCallbacks.push(setTimeout(function() {
             $('button').text('Building...')
-        }, 1500);
+        }, 1500));
 
-        setTimeout(function() {
+        clearableCallbacks.push(setTimeout(function() {
             $('button').text('Still Building...')
-        }, 5000);
+        }, 5000));
 
-        setTimeout(function() {
+        clearableCallbacks.push(setTimeout(function() {
             $('button').text('Please wait a little longer...')
-        }, 10000);
+        }, 10000));
     });
 });
