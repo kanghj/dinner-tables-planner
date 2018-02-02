@@ -35,7 +35,7 @@
     <section>
         <article>
             <form id="template_spreadsheet_contents" action="template_spreadsheet_contents" method="POST">
-                <input type="hidden" id="communities" name="communities" value="{{communities}}">
+                <input type="hidden" id="communities" name="communities" value="{{communities_string}}">
 
                 <input type="hidden" id="persons" name="persons" value="{{persons}}">
 
@@ -43,6 +43,7 @@
             </form>
 
             {% if communities|length != 0 %}
+
                 <label class="right">
                     <input type="checkbox" name="see-original-clique-names" id="see-original-clique-names">
                     Show each person with photos they appear in (hover over the photo number to view the photo)

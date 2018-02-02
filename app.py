@@ -335,7 +335,8 @@ def login():
 @app.route('/template_spreadsheet', methods=['POST'])
 def template_spreadsheet():
     return render_template('template_spreadsheet.html',
-                           communities=request.form['communities'],
+                           communities_string=request.form['communities'],
+                           communities=json.loads(request.form['communities']),
                            persons=request.form['persons'],
                            fb_app_id=fb_app_id)
 
