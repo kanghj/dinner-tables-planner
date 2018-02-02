@@ -57,7 +57,7 @@
 
       function logoutFacebook(event) {
             FB.logout(function(response) {
-              deleteFbCookie("fblo_" + {{fb_app_id}});
+              // deleteFbCookie("fblo_" + {{fb_app_id}});
               window.location.reload();
             });
       }
