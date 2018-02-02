@@ -11,7 +11,7 @@ def merge_similar(communities, threshold = 0.75):
         to_merge = False
         to_merge_community_name = None
         for merged_community_name, merged_community_members in merged_communities.items():
-            if len(merged_community_members) or len(members) == 0:
+            if len(merged_community_members) == 0 or len(members) == 0:
                 continue
             intersection = merged_community_members & members
             if len(intersection) / min(len(merged_community_members), len(members)) >= threshold:
