@@ -49,7 +49,7 @@ function getPhotos(response) {
             FB.api(next, function(response) {
                 if (!response.paging) {
                      if (accumulator.length === 0) {
-                        throw new Error('No publicly accessible photos were available. Please manually fill in template from the home page.');
+                        document.getElementById('status').innerHTML = 'No publicly accessible photos were available. If you do not wish to initialise a template using your Facebook information, please directly download our template from the home page.';
                     }
                     return;
                 }
