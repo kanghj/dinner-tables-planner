@@ -10,7 +10,7 @@ from flask import Flask, request, redirect, render_template, send_file, session,
 from werkzeug.exceptions import abort
 import facebook
 
-from accounts.users import UserJobs
+from accounts.users import UserJobs, JobDates
 from communities import merge_similar
 from tables import create_file_and_upload_to_s3, ans_from_s3_ans_bucket, delete_job, create_staging_file_and_upload_to_s3
 from excel_converter import make_workbook
@@ -123,6 +123,7 @@ def solve():
     if user_facebook_access_token is not None and len(user_facebook_access_token) > 0:
         user_id = verify_facebook_access_token_and_get_user_id()
         db.db_session.add(UserJobs(id=user_id, job_id=job_id))
+        db.db_session.add(JobDates(id=job_id))
         db.db_session.commit()
 
     page_html = """

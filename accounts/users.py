@@ -1,11 +1,23 @@
-from sqlalchemy import Column, Integer, String, select
+import datetime
+
+from sqlalchemy import Column, Integer, String, select, DateTime
 from .db import Base, db_session
+
+from datetime import datetime, timedelta
 
 
 def jobs_of_user(user_id):
     s = db_session.query(UserJobs)
     user_jobs = s.filter(UserJobs.id == user_id)
     return user_jobs
+
+def clear_old():
+    dates = db_session.query(JobDates)
+    date_2_days_ago = datetime.now() - timedelta(days=2)
+
+    old = dates.filter(JobDates.date_created <= date_2_days_ago)
+    old.delete()
+
 
 class UserJobs(Base):
     __tablename__ = 'user_jobs'
@@ -18,3 +30,8 @@ class UserJobs(Base):
 
     def __repr__(self):
         return '<User %r %s>' % (self.name, self.job_id)
+
+class JobDates(Base):
+    __tablename__ = 'job_dates'
+    id = Column(String, primary_key=True)
+    date_created = Column(DateTime, default=datetime.datetime.utcnow())
