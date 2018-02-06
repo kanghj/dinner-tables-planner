@@ -18,8 +18,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-    <script src="static/home.js?date={{yearmonth}}"></script>
-    <script>
+<script>
 
       window.fbAsyncInit = function() {
         FB.init({
@@ -55,16 +54,20 @@
                     $('.fb-login-message').removeClass('hide');
                 }
             }
-          }, {scope: 'user_photos'});
+          }, true);
       }
 
       function logoutFacebook(event) {
             FB.logout(function(response) {
-              // deleteFbCookie("fblo_" + {{fb_app_id}});
-              window.location.reload();
+
+              FB.api('/me/permissions', 'delete', function() {
+                window.location.reload();
+              });
+
             });
       }
     </script>
+<script src="static/home.js?date={{yearmonth}}"></script>
     <div id="fb-root"></div>
     <header>
         <section>
@@ -169,8 +172,7 @@
             <div class="retrieve-results">
                 <h3>Retrieve Results</h3>
                 <p>
-                    If you were logged in to Facebook previously when submitting a guest list, login again to view your free seating chart.
-                    Otherwise, you can retrieve a seating plan with the token that was given to you.
+                    You can retrieve a seating plan with the token that was given to you.
                 </p>
 
 

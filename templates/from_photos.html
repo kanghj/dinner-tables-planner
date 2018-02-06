@@ -39,7 +39,7 @@
   function askForPhotos() {
       FB.getLoginStatus(function(response){
         getPhotos(response);
-      }, {scope: 'user_photos'});
+      }, true);
   }
 
 </script>
