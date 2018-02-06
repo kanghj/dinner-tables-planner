@@ -13,9 +13,9 @@ def jobs_of_user(user_id):
 
 def clear_old():
     dates = db_session.query(JobDates)
-    date_2_days_ago = datetime.datetime.now() - timedelta(days=2)
+    date_5_minnutes_ago = datetime.datetime.now() - timedelta(minutes=5)
 
-    old = dates.filter(JobDates.date_created <= date_2_days_ago)
+    old = dates.filter(JobDates.date_created <= date_5_minnutes_ago)
     old.delete()
 
 
