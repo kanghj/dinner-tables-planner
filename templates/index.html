@@ -60,7 +60,8 @@
       function logoutFacebook(event) {
             FB.logout(function(response) {
 
-              FB.api('/me/permissions', 'delete', function() {
+              FB.api('/me/permissions', 'delete', function(e) {
+                console.log(e);
                 window.location.reload();
               });
 
