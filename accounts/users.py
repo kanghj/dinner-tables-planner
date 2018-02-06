@@ -23,10 +23,8 @@ def clear_old():
 
     job_ids = [old_job.id for old_job in old]
 
+    user_jobs.filter(UserJobs.job_id.in_(job_ids)).delete(synchronize_session='fetch')
     old.delete()
-
-    user_jobs.filter(UserJobs.job_id.in_(job_ids)).delete()
-
 
 class UserJobs(Base):
     __tablename__ = 'user_jobs'
