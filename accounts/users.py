@@ -17,9 +17,9 @@ def clear_old():
     dates = db_session.query(JobDates)
     user_jobs = db_session.query(UserJobs)
 
-    date_5_minnutes_ago = datetime.datetime.now() - timedelta(minutes=5)
+    date_3_weeks_ago = datetime.datetime.now() - timedelta(weeks=3)
 
-    old = dates.filter(JobDates.date_created <= date_5_minnutes_ago)
+    old = dates.filter(JobDates.date_created <= date_3_weeks_ago)
 
     job_ids = [old_job.id for old_job in old]
 
