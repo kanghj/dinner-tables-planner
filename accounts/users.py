@@ -3,7 +3,11 @@ import datetime
 from sqlalchemy import Column, Integer, String, select, DateTime
 from .db import Base, db_session
 
+<<<<<<< HEAD
 from datetime import datetime, timedelta
+=======
+from datetime import timedelta
+>>>>>>> master
 
 
 def jobs_of_user(user_id):
@@ -13,9 +17,11 @@ def jobs_of_user(user_id):
 
 def clear_old():
     dates = db_session.query(JobDates)
-    date_2_days_ago = datetime.now() - timedelta(days=2)
 
-    old = dates.filter(JobDates.date_created <= date_2_days_ago)
+    date_5_minnutes_ago = datetime.datetime.now() - timedelta(minutes=5)
+
+    old = dates.filter(JobDates.date_created <= date_5_minnutes_ago)
+
     old.delete()
 
 

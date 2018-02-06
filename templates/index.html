@@ -18,9 +18,8 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body>
-    <script src="static/home.js?date={{yearmonth}}"></script>
-    <script>
-      deleteFbCookie("fblo_" + {{fb_app_id}});
+<script>
+
       window.fbAsyncInit = function() {
         FB.init({
           appId            : '{{fb_app_id}}',
@@ -29,7 +28,7 @@
           version          : 'v2.11'
         });
 
-        // facebookLogin(function() {});
+        facebookLogin(function() {});
 
       };
 
@@ -48,22 +47,27 @@
             if (response.status === 'connected') {
                 statusChangeCallback(response);
             } else {
+                deleteFbCookie("fblo_" + {{fb_app_id}});
                 if (errCallback) {
                     errCallback();
                 } else {
                     $('.fb-login-message').removeClass('hide');
                 }
             }
-          }, {scope: 'user_photos'});
+          }, true);
       }
 
       function logoutFacebook(event) {
             FB.logout(function(response) {
-              // deleteFbCookie("fblo_" + {{fb_app_id}});
-              window.location.reload();
+
+              FB.api('/me/permissions', 'delete', function() {
+                window.location.reload();
+              });
+
             });
       }
     </script>
+<script src="static/home.js?date={{yearmonth}}"></script>
     <div id="fb-root"></div>
     <header>
         <section>
@@ -113,6 +117,11 @@
                 <p>
                     <a href="/from_photos">You can allow us to initialise a guest list</a> from tagged friends in your Facebook photos.
                 </p>
+
+                <p>
+                    Or download a template guest list <a href="static/example.xlsx">here</a> and complete it by hand.
+                </p>
+
                 <p>
                     After that, edit the guest list through Microsoft Excel.
                     Your guests should be organised based on which social groups they are part of.
@@ -134,7 +143,7 @@
                     In the above example, Hercule Poirot is a classmate to both the groom and bride, hence he is listed in both groups of friends.
                 </small>
 
-                <div>Or download a template guest list <a href="static/example.xlsx">here</a> and complete it by hand.</div>
+
 
             </div>
 
@@ -163,8 +172,7 @@
             <div class="retrieve-results">
                 <h3>Retrieve Results</h3>
                 <p>
-                    If you were logged in to Facebook previously when submitting a guest list, login again to view your free seating chart.
-                    Otherwise, you can retrieve a seating plan with the token that was given to you.
+                    You can retrieve a seating plan with the token that was given to you.
                 </p>
 
 
