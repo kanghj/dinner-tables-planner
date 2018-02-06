@@ -3,11 +3,9 @@ import datetime
 from sqlalchemy import Column, Integer, String, select, DateTime
 from .db import Base, db_session
 
-<<<<<<< HEAD
-from datetime import datetime, timedelta
-=======
+
 from datetime import timedelta
->>>>>>> master
+
 
 
 def jobs_of_user(user_id):
