@@ -20,7 +20,7 @@
 <body>
     <script src="static/home.js?date={{yearmonth}}"></script>
     <script>
-      deleteFbCookie("fblo_" + {{fb_app_id}});
+
       window.fbAsyncInit = function() {
         FB.init({
           appId            : '{{fb_app_id}}',
@@ -48,6 +48,7 @@
             if (response.status === 'connected') {
                 statusChangeCallback(response);
             } else {
+                deleteFbCookie("fblo_" + {{fb_app_id}});
                 if (errCallback) {
                     errCallback();
                 } else {
@@ -134,7 +135,11 @@
                     In the above example, Hercule Poirot is a classmate to both the groom and bride, hence he is listed in both groups of friends.
                 </small>
 
-                <div>Or download a template guest list <a href="static/example.xlsx">here</a> and complete it by hand.</div>
+                <div>
+                    <p>
+                    Or download a template guest list <a href="static/example.xlsx">here</a> and complete it by hand.
+                    </p>
+                </div>
 
             </div>
 
