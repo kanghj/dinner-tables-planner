@@ -15,12 +15,17 @@ def jobs_of_user(user_id):
 
 def clear_old():
     dates = db_session.query(JobDates)
+    user_jobs = db_session.query(UserJobs)
 
     date_5_minnutes_ago = datetime.datetime.now() - timedelta(minutes=5)
 
     old = dates.filter(JobDates.date_created <= date_5_minnutes_ago)
 
+    job_ids = [old_job.id for old_job in old]
+
     old.delete()
+
+    user_jobs.filter(UserJobs.job_id.in_(job_ids)).delete()
 
 
 class UserJobs(Base):
@@ -38,4 +43,4 @@ class UserJobs(Base):
 class JobDates(Base):
     __tablename__ = 'job_dates'
     id = Column(String, primary_key=True)
-    date_created = Column(DateTime, default=datetime.datetime.utcnow())
+    date_created = Column(DateTime, default=datetime.datetime.utcnow)
