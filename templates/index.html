@@ -20,7 +20,7 @@
 <body>
     <script src="static/home.js?date={{yearmonth}}"></script>
     <script>
-      deleteFbCookie("fblo_" + {{fb_app_id}});
+
       window.fbAsyncInit = function() {
         FB.init({
           appId            : '{{fb_app_id}}',
@@ -48,6 +48,7 @@
             if (response.status === 'connected') {
                 statusChangeCallback(response);
             } else {
+                deleteFbCookie("fblo_" + {{fb_app_id}});
                 if (errCallback) {
                     errCallback();
                 } else {
