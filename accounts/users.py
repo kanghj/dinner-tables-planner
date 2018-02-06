@@ -26,6 +26,8 @@ def clear_old():
     user_jobs.filter(UserJobs.job_id.in_(job_ids)).delete(synchronize_session='fetch')
     old.delete()
 
+    db_session.commit()
+
 class UserJobs(Base):
     __tablename__ = 'user_jobs'
     id = Column(String, primary_key=True)
