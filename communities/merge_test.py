@@ -20,7 +20,7 @@ class MergeTest(TestCase):
     def test_positive_example(self):
         test_communities = {
             'abc': set([1,2,3,4]),
-            'def': set([4,5,6,7])
+            'def': set([4,5,6,7, 7])
         }
         merged = merge_similar(test_communities, 0.75)
         self.assertEqual(test_communities, merged)

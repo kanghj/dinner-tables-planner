@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 import pytest
+from collections import defaultdict
 
 from .coarser import coarse_local
 
@@ -218,3 +219,37 @@ class CoarserTest(TestCase):
         self.assertEquals([4], coarse_to_original[4])
 
         self.assertEqual(community.keys(), new_community.keys(), 'communities don''t change')
+
+    def test_coarse_doesnt_add_one_member_to_multiple(self):
+        community = {"2": [1, 2, 3, 4, 5, 6, 7, 1, 8, 9, 10], "3": [11],
+                     "7": [7, 1, 12],
+                     "8": [7, 1, 1, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
+                     "9": [32, 33, 34, 35, 33, 36, 1, 37], "10": [38, 39, 40, 1, 41], "11": [7, 38, 39, 1, 1, 40, 42],
+                     "12": [1, 1, 13, 15, 18, 19, 20, 22, 23, 24, 25, 28, 30, 43, 21, 44, 45, 24, 46, 13, 29, 47, 14, 48],
+                     "13": [32, 34, 35, 33, 36, 1, 37, 16, 49, 50, 1, 33], "14": [33, 1, 51],
+                     "15": [33, 36, 1, 1, 51, 52],
+                     "16": [1, 1, 13, 15, 16, 17, 19, 22, 24, 44, 45, 24, 46, 13, 14, 48, 53, 54, 14, 55, 56, 45, 57, 17, 46],
+                     "17": [7, 1, 28, 24, 46, 13, 14, 54, 56, 45, 57, 58, 59, 60, 57, 61, 62, 63, 48, 64, 65, 23, 66, 67, 46],
+                     "18": [7, 17, 22, 23, 44, 24, 46, 48, 53, 45, 64]}
+        table_size = 10
+        clique_weights = defaultdict(lambda : 1)
+        new_table_sz, new_community, coarse_to_original, presolved_facts = \
+            coarse_local(community, table_size, clique_weights)
+
+        print(new_community)
+        print(coarse_to_original)
+
+        number_of_times_each_person_appears = defaultdict(lambda : 0)
+        for node, members in coarse_to_original.items():
+            for member in members:
+                number_of_times_each_person_appears[member] += 1
+
+        members_appearing_more_than_once = []
+        members_appearing_less_then_once = []
+        for member, count in number_of_times_each_person_appears.items():
+            if count > 1:
+                members_appearing_more_than_once.append(member)
+            elif count < 1:
+                members_appearing_less_then_once.append(member)
+        self.assertEqual(len(members_appearing_more_than_once), 0)
+        self.assertEqual(len(members_appearing_less_then_once), 0)

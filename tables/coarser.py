@@ -17,7 +17,7 @@ def pick_table_with_space(tables: typing.List[int], space_needed: int,
     raise ValueError("no table found")
 
 
-def coarse_local(community: typing.Mapping[int, typing.List[int]],
+def coarse_local(community,
                  table_size: int,
                  clique_weights=None):
     """
@@ -32,6 +32,8 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     """
     if clique_weights is None:
         clique_weights = defaultdict(lambda: 1)
+
+    community = {key : set(members) for key, members in community.items()}
 
     num_persons = len({member for members in community.values()
                        for member in members})
@@ -49,12 +51,12 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
     grouped_clique_members = defaultdict(list)
     members_cooccurence = defaultdict(lambda: defaultdict((lambda: 0)))
 
-    cliques_of_person: typing.MutableMapping[int, typing.List[int]] = \
-        defaultdict(list)
+    cliques_of_person: typing.MutableMapping[int, typing.Set[int]] = \
+        defaultdict(set)
     coupled_persons_of_person = defaultdict(list)
     for clique_name, members in community.items():
         for member in members:
-            cliques_of_person[member].append(clique_name)
+            cliques_of_person[member].add(clique_name)
         if clique_weights[clique_name] <= 0:
             # prevent persons with only zero or negative to be coarsened
             continue
@@ -150,4 +152,6 @@ def coarse_local(community: typing.Mapping[int, typing.List[int]],
             #     clique_rep_already_in_table[clique_rep] =
             # table_to_seat_clique
 
+    new_community = {name: sorted(list(members)) for name,members in new_community.items()}
+    node_to_persons = {node: sorted(list(members)) for node, members in node_to_persons.items()}
     return new_table_sz, new_community, node_to_persons, presolved_facts
