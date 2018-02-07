@@ -374,7 +374,7 @@ def template_spreadsheet_contents():
     html_response += headers_html
     body_html = ""
 
-    merged_communities = [community for community in merged_communities.items() if len(community) > 0]
+    merged_communities = {key: community for key, community in merged_communities.items() if len(community) > 0}
 
     largest_community_size = max([len(community) for community in merged_communities.values()])
     for i in range(0, largest_community_size):
